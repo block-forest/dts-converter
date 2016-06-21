@@ -42,8 +42,8 @@ If this doesn't make any sense, use Mode 1.
 
 # Example
 
-You can find a conversion result here https://github.com/blockforest/dts-converter/test/chart-generated/chart/chart.d.dart
-It was generated from this source: https://github.com/blockforest/dts-converter/test/chart/chart.d.ts
+You can find a conversion result here https://github.com/blockforest/dts-converter/blob/master/test/chart-generated/chart/chart.d.dart
+It was generated from this source: https://github.com/blockforest/dts-converter/blob/master/test/chart/chart.d.ts
 
 ## Try for yourself
 
