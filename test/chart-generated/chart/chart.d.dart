@@ -1,4 +1,4 @@
-@JS()
+@JS('Chart')
 library chart;
 
 import "package:func/func.dart";
@@ -124,9 +124,7 @@ class ChartSettings {
       num tooltipCornerRadius,
       num tooltipXOffset,
       String tooltipTemplate,
-      String multiTooltipTemplate,
-      Func0<dynamic> onAnimationProgress,
-      Func0<dynamic> onAnimationComplete});
+      String multiTooltipTemplate});
 
   external bool get animation;
   external set animation(bool v);
@@ -513,7 +511,6 @@ class Chart {
   external LinearInstance Bar(LinearChartData data, BarChartOptions options);
   external LinearInstance Radar(
       LinearChartData data, RadarChartOptions options);
-
   external CircularInstance PolarArea(
       List<CircularChartData> data, PolarAreaChartOptions options);
   external CircularInstance Pie(

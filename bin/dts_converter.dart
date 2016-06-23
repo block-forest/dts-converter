@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:path/path.dart';
+import 'package:dts_converter/dts_converter.dart';
 
 const String DEFAULT_TARGET_LIBRARY = "";
 const String DEFAULT_SOURCE_LIBRARY = "";
 const String DEFAULT_SOURCE_DIR = "";
 const String DEFAULT_TARGET_DIR = "lib";
 const bool FULL_DART_PROJECT = false;
+
+Converter _converter = new Converter();
 
 String dart_library_name;
 String source_library_name;
@@ -43,7 +46,7 @@ void main(List args) {
 
   //prepare the library file so we can append 'part' files
   library_file_content = '''
-@JS()
+@JS('$source_library_name')
 library $dart_library_name;
 
 import "package:func/func.dart";
@@ -125,25 +128,25 @@ dependencies:
 }
 
 /// Takes a File path, e.g. test/chart/chart.d.ts, and writes it to
-/// the output directory provided, e.g. lib/src/chart.d.dart.
+/// the output directory provided, e.g. lib/src/chart.beta.d.dart.
 /// During the process, excessive RegExp magic is applied.
 void _convert(String asFilePath) {
   //e.g. test/chart/chart.d.ts
-  print("asFilePath: $asFilePath");
+  //print("asFilePath: $asFilePath");
 
   File asFile = new File(asFilePath);
 
   //Package name, e.g. chart/foo
   String dartFilePath = asFilePath.replaceFirst(new RegExp(source_basedir + "/"), "");
   dartFilePath = dirname(dartFilePath);
-  print("dartFilePath: $dartFilePath");
+  //print("dartFilePath: $dartFilePath");
 
-  //New filename, e.g. chart.d.dart
+  //New filename, e.g. chart.beta.d.dart
   String dartFileName = basenameWithoutExtension(asFile.path)
       .replaceAllMapped(new RegExp("(IO|I|[^A-Z-])([A-Z])"), (Match m) => (m.group(1) + "_" + m.group(2)))
       .toLowerCase();
   dartFileName += ".dart";
-  print("dartFileName: $dartFileName");
+  //print("dartFileName: $dartFileName");
 
   String asFileContents = asFile.readAsStringSync();
   String dartFileContents = _applyMagic(asFileContents);
@@ -151,7 +154,7 @@ void _convert(String asFilePath) {
   //Write new file
   String dartFileNameFull = join(target_basedir, create_full_project ? "lib" : "", create_full_project ? "src" : "",
       dart_library_name.toLowerCase(), dartFileName);
-  print("dartFileNameFull: $dartFileNameFull");
+  //print("dartFileNameFull: $dartFileNameFull");
   new File(dartFileNameFull).absolute
     ..createSync(recursive: true)
     ..writeAsStringSync(dartFileContents);
@@ -169,152 +172,7 @@ void _convert(String asFilePath) {
 /// Applies magic to an .d.ts file String, converting it to almost error free Dart.
 /// Please report errors and edge cases to github issue tracker.
 String _applyMagic(String f) {
-  // Remove Namespace if exists
-  if (f.contains("declare namespace")) {
-    f = f.replaceAllMapped(new RegExp("(\\s*)declare\\s+namespace\\s+[A-Za-z0-9.]+\\s*\\{"), (Match m) => "${m[1]}");
-    // remove closing bracket at end of file
-    f = f.replaceAll(new RegExp("\\}\\s*\$"), "");
-  }
-
-  /* --------- TYPES */
-
-  f = f.replaceAll(new RegExp("number"), "num");
-  f = f.replaceAll(new RegExp("boolean"), "bool");
-  f = f.replaceAll(new RegExp("string"), "String");
-  f = f.replaceAll(new RegExp("Array<"), "List<");
-  f = f.replaceAll(new RegExp("\\{\\}\\[\\]"), "List");
-
-  /* --------- DEFINITION BODY */
-
-  /*
-    Search for 'interface' + CLASS + 'extends FOO' + BODY
-    Repace with annotated 'external CLASS' and constructor definition
-    Comment out 'extends FOO' if exists
-    Insert BODY into both factory constructor and class body for later type conversion
-   */
-  f = f.replaceAllMapped(
-      new RegExp("(\\s*)interface\\s+([A-Za-z0-9.]+)\\s+(extends\\s+\\w+)*\\s*\\{([^}]+)\\}\n"),
-      (Match m) =>
-          "${m[1]}\n@anonymous\n@JS()\nclass ${m[2]} {\n\texternal factory ${m[2]} ${m[3] == null ? "" : "/* ${m[3]} */"}(\n\t\t{${m[4]}});\n${m[4]}\n}\n");
-
-  /* --------- DEFINITION SYNTAX */
-
-  // Remove "?"
-  f = f.replaceAllMapped(new RegExp("(\\?)"), (Match m) => "");
-
-  // Convert function definitions
-  // f.ex. foo : () => any  -->  any foo()
-  // f.ex. foo : (value : number) => string --> string foo(value : number)
-  f = f.replaceAllMapped(new RegExp("\\?*:\\s*\\(([^)]*)\\s*\\)\\s*=>"), (Match m) => "(${m[1]}) :");
-
-  // Convert type definition position
-  // f.ex. foo : number --> number foo
-  f = f.replaceAllMapped(new RegExp("(\\s*)(.*)\\s*:\\s*(.*)\\s*;"), (Match m) => "${m[1]} ${m[3]} ${m[2]};");
-
-  // Convert type definition position in function parameter definition
-  // f.ex. foo(bar : number) --> foo(number bar)
-  f = f.replaceAllMapped(
-      new RegExp("([A-Za-z0-9_]+)\\s*:\\s*([A-Za-z0-9_\\[\\]]*)\\s*([),])"), (Match m) => "${m[2]} ${m[1]} ${m[3]}");
-
-  // Convert typed array to typed List
-  // f.ex. number[] --> List<number>
-  f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_]+)\\[\\]"), (Match m) => "List<${m[1]}>");
-
-  /* --------- FIELDS */
-
-  // Fields to factory named arguments
-  f = f.replaceAllMapped(new RegExp("\\(\\s*\\{([^}]*)\\}\\s*\\);"), (Match m) {
-    //replace any with Function
-    String intrnl = m[1].replaceAll(new RegExp("any"), "Func0<dynamic>");
-    //remove "()" if Function is the type
-    intrnl = intrnl.replaceAllMapped(
-        new RegExp("(Func[A-Za-z0-9_<>]+)\\s+(.*)\\s*\\(\\s*\\)"), (Match n) => "${n[1]} ${n[2]}");
-    //replace ; with ,
-    intrnl = intrnl.replaceAll(new RegExp(";"), ",");
-    // remove erraneously inserted arguments (function definitions)
-    intrnl = intrnl.replaceAll(new RegExp("\\s*.+\\(.*\\)\\s*,"), "");
-    // remove comma at end of parameter list
-    intrnl = intrnl.replaceAll(new RegExp(",\\s*\$"), "\n");
-
-    return "(\n\t{${intrnl}\t});";
-  });
-
-  // Fields to class getters/setters
-  f = f.replaceAllMapped(new RegExp("\\}\\s*\\)\\s*;\\s*([^}]+)\\}"), (Match m) {
-    // prefix all members that are not functions with 'external' and add 'get'
-    String intrnl = m[1].replaceAllMapped(
-        new RegExp("([A-Za-z0-9_<>]+)\\s*([A-Za-z0-9_<>]+)\\s*;"), (Match n) => "external ${n[1]} get ${n[2]};");
-    intrnl =
-        intrnl.replaceAllMapped(new RegExp("any(.*)\\(\\s*\\)"), (Match n) => "external Func0<dynamic> get ${n[1]}");
-
-    //prefix all functions with 'external'
-    intrnl = intrnl.replaceAllMapped(
-        new RegExp("([A-Za-z0-9_<>]+\\s+[A-Za-z0-9_<>]+\\(.*\\))\\s*;"), (Match n) => "external ${n[1]};");
-
-    //create setters
-    intrnl = intrnl.replaceAllMapped(new RegExp("external\\s+([A-Za-z0-9_<>]+)\\s+get\\s+([A-Za-z0-9_]+)\\s*;"),
-        (Match n) => "external ${n[1]} get ${n[2]};\n\t\texternal set ${n[2]}(${n[1]} v);");
-
-    return "});\n\n\t\t${intrnl}\n}";
-  });
-
-  /* --------- CLEANUP */
-
-  // Delete factory if no arguments
-  f = f.replaceAll(
-      new RegExp("external\\s*factory\\s*[A-Za-z0-9_]+\\s*[A-Za-z0-9_\\/\\* ]*\\s*\\(\\s*\\{\\s*\\}\\);"), "");
-
-  /* --------- TRICKY STUFF */
-
-  /**
-   * search for interface and var def that are named like the library (e.g. Chart)
-    EXAMPLE:
-      declare var Chart: {
-     Chart new (CanvasRenderingContext2D context );
-      defaults: {
-         ChartSettings global;
-      }
-    };
-   * */
-  String declaredClasses = "";
-
-  RegExp r1 = new RegExp("class ($source_library_name)", caseSensitive: false);
-  RegExp r2 = new RegExp("declare var $source_library_name", caseSensitive: false);
-  RegExp r3 = new RegExp("$source_library_name\\s+new\\s+\\((.*)\\)\\s*;", caseSensitive: false);
-  if (r1.hasMatch(f) && r2.hasMatch(f)) {
-    String insert = "";
-    String content = "";
-
-    //library name
-    String lib_name = r1.firstMatch(f).group(1);
-
-    // extract conversion of 'LIB new (...)' to 'external LIB (...)'
-    content = r3.firstMatch(f).group(1);
-    insert = "external $lib_name($content);";
-
-    f = f.replaceAllMapped(r3, (Match m) => "");
-
-    // extract everything inside LIB var declaration
-    Match match = new RegExp("(declare\\s+var\\s+${lib_name}\\s*\\:\\s*\\{)([^\\}]*\\s*\\}\\s*\\};)").firstMatch(f);
-    content = match.group(2);
-    f = f.replaceFirst(match.group(1) + match.group(2), "");
-
-    // convert properties of LIB var declaration
-    content.replaceAllMapped(new RegExp("([A-Za-z0-9_]+)\\s*:\\s*\\{([^\\}]*)\\}"), (Match m) {
-      // convert each property to LIB class getter/setter as own classes
-      insert += "\nexternal static ${lib_name}_${m[1]} get ${m[1]};";
-      insert += "\nexternal static set ${m[1]}(${lib_name}_${m[1]} v);";
-      // convert each property body to own class
-      declaredClasses += "\n@anonymous\n@JS()\nclass ${lib_name}_${m[1]}{\n${m[2]}\n}\n";
-      declaredClasses = declaredClasses.replaceAllMapped(
-          new RegExp("([A-Za-z0-9_]+)\\s+([A-Za-z0-9_]+)\\s*;"), (Match n) => "\nexternal ${n[1]} get ${n[2]};");
-    });
-
-    f = f.replaceAllMapped(
-        new RegExp("@anonymous\\s*(@JS\\(\\)\\s*class\\s+${lib_name}\\s*\\{)"), (Match m) => "${m[1]}\n\t${insert}\n");
-  }
-
-  return "${dart_file_content} $f \n\n$declaredClasses";
+  return _converter.convert(f,source_library_name, dart_file_content);
 }
 
 /// Manages the script's arguments and provides instructions and defaults for the --help option.
