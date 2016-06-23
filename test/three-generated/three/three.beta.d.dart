@@ -1,5 +1,5 @@
 @JS('THREE')
-library three;
+library threejs;
 
 import "package:func/func.dart";
 import "package:js/js.dart";
@@ -147,6 +147,13 @@ external int get LoopPingPong;
 //void export function warn(dynamic message , ...List<dynamic> optionalParams );
 //void export function error(dynamic message , ...List<dynamic> optionalParams );
 //void export function log(dynamic message , ...List<dynamic> optionalParams );
+
+@JS()
+class WebGLRenderer implements Renderer{
+  external factory WebGLRenderer([WebGLRendererParameters parameters]);
+  external void setSize(num width , num height );
+  external CanvasElement get domElement;
+}
 
 /*@anonymous*/
 @JS()
@@ -415,14 +422,14 @@ class CubeCamera {
 }
 
 /**
-     * Camera with orthographic projection
-     *
-     * @example
-     * var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-     * scene.add( camera );
-     *
-     * @see <a href="https:
-     */
+ * Camera with orthographic projection
+ *
+ * @example
+ * var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+ * scene.add( camera );
+ *
+ * @see <a href="https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -431,13 +438,13 @@ class OrthographicCamera {
       num left, num right, num top, num bottom, num near, num far);
 
   /**
-         * @param left Camera frustum left plane.
-         * @param right Camera frustum right plane.
-         * @param top Camera frustum top plane.
-         * @param bottom Camera frustum bottom plane.
-         * @param near Camera frustum near plane.
-         * @param far Camera frustum far plane.
-         */
+   * @param left Camera frustum left plane.
+   * @param right Camera frustum right plane.
+   * @param top Camera frustum top plane.
+   * @param bottom Camera frustum bottom plane.
+   * @param near Camera frustum near plane.
+   * @param far Camera frustum far plane.
+   */
 
   external num get zoom;
   external set zoom(num v);
@@ -466,14 +473,14 @@ class OrthographicCamera {
 }
 
 /**
-     * Camera with perspective projection.
-     *
-     * # example
-     *     var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
-     *     scene.add( camera );
-     *
-     * @source https:
-     */
+ * Camera with perspective projection.
+ *
+ * # example
+ *     var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+ *     scene.add( camera );
+ *
+ * @source https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -481,11 +488,11 @@ class PerspectiveCamera {
   external factory PerspectiveCamera /* extends Camera */ (num fov, num aspect, num near, num far);
 
   /**
-         * @param fov Camera frustum vertical field of view. Default value is 50.
-         * @param aspect Camera frustum aspect ratio. Default value is 1.
-         * @param near Camera frustum near plane. Default value is 0.1.
-         * @param far Camera frustum far plane. Default value is 2000.
-         */
+   * @param fov Camera frustum vertical field of view. Default value is 50.
+   * @param aspect Camera frustum aspect ratio. Default value is 1.
+   * @param near Camera frustum near plane. Default value is 0.1.
+   * @param far Camera frustum far plane. Default value is 2000.
+   */
 
   external num get zoom;
   external set zoom(num v);
@@ -503,52 +510,52 @@ class PerspectiveCamera {
   external set far(num v);
 
   /**
-         * Uses focal length (in mm) to estimate and set FOV 35mm (fullframe) camera is used if frame size is not specified.
-         * Formula based on http:
-         * @param focalLength focal length
-         * @param frameHeight frame size. Default value is 24.
-         */
+   * Uses focal length (in mm) to estimate and set FOV 35mm (fullframe) camera is used if frame size is not specified.
+   * Formula based on http:
+   * @param focalLength focal length
+   * @param frameHeight frame size. Default value is 24.
+   */
   external void setLens(num focalLength, num frameHeight);
 
   /**
-         * Sets an offset in a larger frustum. This is useful for multi-window or multi-monitor/multi-machine setups.
-         * For example, if you have 3x2 monitors and each monitor is 1920x1080 and the monitors are in grid like this:
-         *
-         *     +---+---+---+
-         *     | dynamic  |
-         *     +---+---+---+
-         *     | dynamic  |
-         *     +---+---+---+
-         *
-         * then for each monitor you would call it like this:
-         *
-         *     var w = external 192 get 0;
-		external set 0(192 v);
-         *     var h = external 108 get 0;
-		external set 0(108 v);
-         *     var fullWidth = w * 3;
-         *     var fullHeight = h * 2;
-         *
-         *     
-         *     camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
-         *     
-         *     camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
-         *     
-         *     camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
-         *     
-         *     camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
-         *     
-         *     camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
-         *     
-         *     camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h ); Note there is no reason monitors have to be the same size or in a grid.
-         *
-         * @param fullWidth full width of multiview setup
-         * @param fullHeight full height of multiview setup
-         * @param x horizontal offset of subcamera
-         * @param y vertical offset of subcamera
-         * @param width width of subcamera
-         * @param height height of subcamera
-         */
+   * Sets an offset in a larger frustum. This is useful for multi-window or multi-monitor/multi-machine setups.
+   * For example, if you have 3x2 monitors and each monitor is 1920x1080 and the monitors are in grid like this:
+   *
+   *     +---+---+---+
+   *     | dynamic  |
+   *     +---+---+---+
+   *     | dynamic  |
+   *     +---+---+---+
+   *
+   * then for each monitor you would call it like this:
+   *
+   *     var w = external 192 get 0;
+      external set 0(192 v);
+   *     var h = external 108 get 0;
+      external set 0(108 v);
+   *     var fullWidth = w * 3;
+   *     var fullHeight = h * 2;
+   *
+   *
+   *     camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+   *
+   *     camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+   *
+   *     camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+   *
+   *     camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+   *
+   *     camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+   *
+   *     camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h ); Note there is no reason monitors have to be the same size or in a grid.
+   *
+   * @param fullWidth full width of multiview setup
+   * @param fullHeight full height of multiview setup
+   * @param x horizontal offset of subcamera
+   * @param y vertical offset of subcamera
+   * @param width width of subcamera
+   * @param height height of subcamera
+   */
   external void setViewOffset(num fullWidth, num fullHeight, num x, num y, num width, num height);
   external void updateProjectionMatrix();
   external PerspectiveCamera clone();
@@ -664,12 +671,12 @@ class Float64Attribute {
 }
 
 /**
-     * This is a superefficent class for geometries because it saves all data in buffers.
-     * It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the nessecary buffer calculations.
-     * It is mainly interesting when working static with objects.
-     *
-     * @see <a href="https:
-     */
+ * This is a superefficent class for geometries because it saves all data in buffers.
+ * It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the nessecary buffer calculations.
+ * It is mainly interesting when working static with objects.
+ *
+ * @see <a href="https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -769,10 +776,10 @@ class Channels {
 }
 
 /**
-     * Object for keeping track of time.
-     *
-     * @see <a href="https:
-     */
+ * Object for keeping track of time.
+ *
+ * @see <a href="https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -861,30 +868,30 @@ class DirectGeometry {
 }
 
 /**
-     * JavaScript events for custom objects
-     *
-     * # Example
-     *     var Car = function () {
-     *
-     *         EventDispatcher.call( this );
-     *         this.start = function () {
-     *
-      'vroom vroom!' } ) *             this.dispatchEvent( { type: 'start', message;
-     *
-     *         };
-     *
-     *     };
-     *
-     *     var car = new Car();
-     *     car.addEventListener( 'start', function ( event ) {
-     *
-     *         alert( event.message );
-     *
-     *     } );
-     *     car.start();
-     *
-     * @source src/core/EventDispatcher.js
-     */
+ * JavaScript events for custom objects
+ *
+ * # Example
+ *     var Car = function () {
+ *
+ *         EventDispatcher.call( this );
+ *         this.start = function () {
+ *
+    'vroom vroom!' } ) *             this.dispatchEvent( { type: 'start', message;
+ *
+ *         };
+ *
+ *     };
+ *
+ *     var car = new Car();
+ *     car.addEventListener( 'start', function ( event ) {
+ *
+ *         alert( event.message );
+ *
+ *     } );
+ *     car.start();
+ *
+ * @source src/core/EventDispatcher.js
+ */
 
 /*@anonymous*/
 @JS()
@@ -892,24 +899,24 @@ class EventDispatcher {
   external factory EventDispatcher();
 
   /**
-         * Adds a listener to an event type.
-         * @param type The type of the listener that gets removed.
-         * @param listener The listener function that gets removed.
-         */
+   * Adds a listener to an event type.
+   * @param type The type of the listener that gets removed.
+   * @param listener The listener function that gets removed.
+   */
   external void addEventListener(String type, VoidFunc1<dynamic> listener);
 
   /**
-         * Adds a listener to an event type.
-         * @param type The type of the listener that gets removed.
-         * @param listener The listener function that gets removed.
-         */
+   * Adds a listener to an event type.
+   * @param type The type of the listener that gets removed.
+   * @param listener The listener function that gets removed.
+   */
   external void hasEventListener(String type, VoidFunc1<dynamic> listener);
 
   /**
-         * Removes a listener from an event type.
-         * @param type The type of the listener that gets removed.
-         * @param listener The listener function that gets removed.
-         */
+   * Removes a listener from an event type.
+   * @param type The type of the listener that gets removed.
+   * @param listener The listener function that gets removed.
+   */
   external void removeEventListener(String type, VoidFunc1<dynamic> listener);
 
 /*         dispatchEvent(event # type: external Strin get g;
@@ -920,15 +927,15 @@ class EventDispatcher {
 }
 
 /**
-     * Triangle face.
-     *
-     * # Example
-     *     var normal = new THREE.Vector3( 0, 1, 0 );
-     *     var color = new THREE.Color( 0xffaa00 );
-     *     var face = new THREE.Face3( 0, 1, 2, normal, color, 0 );
-     *
-     * @source https:
-     */
+ * Triangle face.
+ *
+ * # Example
+ *     var normal = new THREE.Vector3( 0, 1, 0 );
+ *     var color = new THREE.Color( 0xffaa00 );
+ *     var face = new THREE.Face3( 0, 1, 2, normal, color, 0 );
+ *
+ * @source https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -936,13 +943,13 @@ class Face3 {
   external factory Face3(num a, num b, num c, List<Vector3> vertexNormals, List<Color> vertexColors, num materialIndex);
 
   /**
-         * @param a Vertex A index.
-         * @param b Vertex B index.
-         * @param c Vertex C index.
-         * @param normal Face normal or array of vertex normals.
-         * @param color Face color or array of vertex colors.
-         * @param materialIndex Material index.
-         */
+   * @param a Vertex A index.
+   * @param b Vertex B index.
+   * @param c Vertex C index.
+   * @param normal Face normal or array of vertex normals.
+   * @param color Face color or array of vertex colors.
+   * @param materialIndex Material index.
+   */
 
   external num get a;
   external set a(num v);
@@ -1016,18 +1023,18 @@ class BoundingSphere {
 }
 
 /**
-     * Base class for geometries
-     *
-     * # Example
-     *     var geometry = new THREE.Geometry();
-     *     geometry.vertices.push( new THREE.Vector3( -10, 10, 0 ) );
-     *     geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
-     *     geometry.vertices.push( new THREE.Vector3( 10, -10, 0 ) );
-     *     geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
-     *     geometry.computeBoundingSphere();
-     *
-     * @see https:
-     */
+ * Base class for geometries
+ *
+ * # Example
+ *     var geometry = new THREE.Geometry();
+ *     geometry.vertices.push( new THREE.Vector3( -10, 10, 0 ) );
+ *     geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
+ *     geometry.vertices.push( new THREE.Vector3( 10, -10, 0 ) );
+ *     geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+ *     geometry.computeBoundingSphere();
+ *
+ * @see https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -1258,10 +1265,10 @@ class Object3D {
   external void setRotationFromQuaternion(Quaternion q);
 
   /**
-         * Rotate an object along an axis in object space. The axis is assumed to be normalized.
-         * @param axis  A normalized vector in object space.
-         * @param angle  The angle in radians.
-         */
+   * Rotate an object along an axis in object space. The axis is assumed to be normalized.
+   * @param axis  A normalized vector in object space.
+   * @param angle  The angle in radians.
+   */
   external Object3D rotateOnAxis(Vector3 axis, num angle);
   external Object3D rotateX(num angle);
   external Object3D rotateY(num angle);
@@ -1269,10 +1276,10 @@ class Object3D {
   external Object3D translateOnAxis(Vector3 axis, num distance);
 
   /**
-         *
-         * @param distance
-         * @param axis
-         */
+   *
+   * @param distance
+   * @param axis
+   */
   external Object3D translate(num distance, Vector3 axis);
   external Object3D translateX(num distance);
   external Object3D translateY(num distance);
@@ -1299,10 +1306,10 @@ class Object3D {
   external Object3D clone(bool recursive);
 
   /**
-         *
-         * @param object
-         * @param recursive
-         */
+   *
+   * @param object
+   * @param recursive
+   */
   external Object3D copy(Object3D source, bool recursive);
 
   external void addEventListener(String type, VoidFunc1<dynamic> listener);
@@ -1381,7 +1388,7 @@ class Raycaster {
 
 /*@anonymous*/
 @JS()
-class Light {
+class Light extends Object3D{
   external factory Light /* extends Object3D */ (dynamic hex);
 
   external Color get color;
@@ -1438,14 +1445,14 @@ class LightShadow {
 }
 
 /**
-     * This light's color gets applied to all the objects in the scene globally.
-     *
-     * # example
-     *     var light = new THREE.AmbientLight( 0x404040 ); 
-     *     scene.add( light );
-     *
-     * @source https:
-     */
+ * This light's color gets applied to all the objects in the scene globally.
+ *
+ * # example
+ *     var light = new THREE.AmbientLight( 0x404040 );
+ *     scene.add( light );
+ *
+ * @source https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -1457,16 +1464,16 @@ class AmbientLight {
 }
 
 /**
-     * Affects objects using MeshLambertMaterial or MeshPhongMaterial.
-     *
-     * @example
-     * 
-     * var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-     * directionalLight.position.set( 0, 1, 0 );
-     * scene.add( directionalLight );
-     *
-     * @see <a href="https:
-     */
+ * Affects objects using MeshLambertMaterial or MeshPhongMaterial.
+ *
+ * @example
+ *
+ * var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+ * directionalLight.position.set( 0, 1, 0 );
+ * scene.add( directionalLight );
+ *
+ * @see <a href="https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -1499,18 +1506,18 @@ class HemisphereLight {
 }
 
 /**
-     * Affects objects using {@link MeshLambertMaterial} or {@link MeshPhongMaterial}.
-     *
-     * @example
-     * var light = new THREE.PointLight( 0xff0000, 1, 100 );
-     * light.position.set( 50, 50, 50 );
-     * scene.add( light );
-     */
+ * Affects objects using {@link MeshLambertMaterial} or {@link MeshPhongMaterial}.
+ *
+ * @example
+ * var light = new THREE.PointLight( 0xff0000, 1, 100 );
+ * light.position.set( 50, 50, 50 );
+ * scene.add( light );
+ */
 
 /*@anonymous*/
 @JS()
-class PointLight {
-  external factory PointLight /* extends Light */ (dynamic hex, num intensity, num distance, num decay);
+class PointLight extends Light {
+  external factory PointLight   (dynamic hex, [num intensity, num distance, num decay]);
 
   /*
          * Light's intensity.
@@ -1577,18 +1584,18 @@ class Progress {
 }
 
 /**
-     * Base class for implementing loaders.
-     *
-     * Events:
-     *     load
-     *         Dispatched when the image has completed loading
-     *         content — loaded image
-     *
-     *     error
-     *
-     *          Dispatched when the image can't be loaded
-     *          message — error message
-     */
+ * Base class for implementing loaders.
+ *
+ * Events:
+ *     load
+ *         Dispatched when the image has completed loading
+ *         content — loaded image
+ *
+ *     error
+ *
+ *          Dispatched when the image can't be loaded
+ *          message — error message
+ */
 
 /*@anonymous*/
 @JS()
@@ -1622,32 +1629,32 @@ class Cache {
 }
 
 /*
-    
+
 /*@anonymous*/
 @JS()
 class ObjectLoader {
 	external factory ObjectLoader (LoadingManager manager);
 
-        
 
-         
+
+
 
 		external LoadingManager get manager;
 		external set manager(LoadingManager v);
          external String get texturePass;
-		external set texturePass(String v);external 
+		external set texturePass(String v);external
 
-         void load(String url , onLoad(Object3D object ) : void);external 
-         void setTexturePath( String value );external 
+         void load(String url , onLoad(Object3D object ) : void);external
+         void setTexturePath( String value );external
          void setCrossOrigin(String crossOrigin );
-         T external parse<T extends Object3D>(dynamic json , onLoad(Object3D object ) : void);external 
-         List<dynamic> parseGeometries(dynamic json );external  
-         List<Material> parseMaterials(dynamic json , List<Texture> textures ); 
-         List<external Func0<dynamic> external get > parseImages( dynamic json , onLoad : void );external 
+         T external parse<T extends Object3D>(dynamic json , onLoad(Object3D object ) : void);external
+         List<dynamic> parseGeometries(dynamic json );external
+         List<Material> parseMaterials(dynamic json , List<Texture> textures );
+         List<external Func0<dynamic> external get > parseImages( dynamic json , onLoad : void );external
          List<Texture> parseTextures( dynamic json , dynamic images );
          T external parseObject<T extends Object3D>(dynamic data , List<dynamic> geometries , List<Material> materials );
 
-    
+
 
 }
 
@@ -1767,8 +1774,8 @@ class Material {
   external set alphaTest(num v);
 
   /**
-         * Enables/disables overdraw. If greater than zero, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the CanvasRenderer. Default is 0.
-         */
+   * Enables/disables overdraw. If greater than zero, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the CanvasRenderer. Default is 0.
+   */
   external num get overdraw;
   external set overdraw(num v);
 
@@ -1996,10 +2003,10 @@ class MeshDepthMaterial {
   external MeshDepthMaterial copy(MeshDepthMaterial source);
 }
 
-/*@anonymous*/
+@anonymous
 @JS()
-class MeshLambertMaterialParameters {
-  external factory MeshLambertMaterialParameters() /* extends MaterialParameters */;
+class MeshLambertMaterialParameters extends MaterialParameters{
+  external factory MeshLambertMaterialParameters({dynamic color});
 
   external dynamic get color;
   external set color(dynamic v);
@@ -2039,7 +2046,7 @@ class MeshLambertMaterialParameters {
 
 /*@anonymous*/
 @JS()
-class MeshLambertMaterial {
+class MeshLambertMaterial extends Material{
   external factory MeshLambertMaterial /* extends Material */ (MeshLambertMaterialParameters parameters);
 
   external Color get color;
@@ -2555,13 +2562,13 @@ class HSL {
 }
 
 /**
-     * Represents a color. See also {@link ColorUtils}.
-     *
-     * @example
-     * var color = new THREE.Color( 0xff0000 );
-     *
-     * @see <a href="https:
-     */
+ * Represents a color. See also {@link ColorUtils}.
+ *
+ * @example
+ * var color = new THREE.Color( 0xff0000 );
+ *
+ * @see <a href="https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -2580,21 +2587,21 @@ class Color {
   external Color setHex(num hex);
 
   /**
-         * Sets this color from RGB values.
-         * @param r Red channel value between 0 and 1.
-         * @param g Green channel value between 0 and 1.
-         * @param b Blue channel value between 0 and 1.
-         */
+   * Sets this color from RGB values.
+   * @param r Red channel value between 0 and 1.
+   * @param g Green channel value between 0 and 1.
+   * @param b Blue channel value between 0 and 1.
+   */
   external Color setRGB(num r, num g, num b);
 
   /**
-         * Sets this color from HSL values.
-         * Based on MochiKit implementation by Bob Ippolito.
-         *
-         * @param h Hue channel value between 0 and 1.
-         * @param s Saturation value channel between 0 and 1.
-         * @param l Value channel value between 0 and 1.
-         */
+   * Sets this color from HSL values.
+   * Based on MochiKit implementation by Bob Ippolito.
+   *
+   * @param h Hue channel value between 0 and 1.
+   * @param s Saturation value channel between 0 and 1.
+   * @param l Value channel value between 0 and 1.
+   */
   external Color setHSL(num h, num s, num l);
   external Color setStyle(String style);
   external Color clone();
@@ -2996,24 +3003,24 @@ class Math {
   external String generateUUID();
 
   /**
-         * Clamps the x to be between a and b.
-         *
-         * @param value Value to be clamped.
-         * @param min Minimum value
-         * @param max Maximum value.
-         */
+   * Clamps the x to be between a and b.
+   *
+   * @param value Value to be clamped.
+   * @param min Minimum value
+   * @param max Maximum value.
+   */
   external num clamp(num value, num min, num max);
   external num euclideanModulo(num n, num m);
 
   /**
-         * Linear mapping of x from range [a1, a2] to range [b1, b2].
-         *
-         * @param x Value to be mapped.
-         * @param a1 Minimum value for range A.
-         * @param a2 Maximum value for range A.
-         * @param b1 Minimum value for range B.
-         * @param b2 Maximum value for range B.
-         */
+   * Linear mapping of x from range [a1, a2] to range [b1, b2].
+   *
+   * @param x Value to be mapped.
+   * @param a1 Minimum value for range A.
+   * @param a2 Maximum value for range A.
+   * @param b1 Minimum value for range B.
+   * @param b2 Maximum value for range B.
+   */
   external num mapLinear(num x, num a1, num a2, num b1, num b2);
   external num smoothstep(num x, num min, num max);
   external num smootherstep(num x, num min, num max);
@@ -3022,8 +3029,8 @@ class Math {
   external num randFloat(num low, num high);
 
   /**
-         * Random float from - range / 2 to range / 2 interval.
-         */
+   * Random float from - range / 2 to range / 2 interval.
+   */
   external num randFloatSpread(num range);
   external num degToRad(num degrees);
   external num radToDeg(num radians);
@@ -3073,34 +3080,34 @@ class Matrix3 {
 }
 
 /**
-     * A 4x4 Matrix.
-     *
-     * @example
-     * 
-     * var m = new THREE.Matrix4();
-     * var m1 = new THREE.Matrix4();
-     * var m2 = new THREE.Matrix4();
-     * var m3 = new THREE.Matrix4();
-     * var alpha = 0;
-     * var beta = Math.PI;
-     * var gamma = Math.PI/2;
-     * m1.makeRotationX( alpha );
-     * m2.makeRotationY( beta );
-     * m3.makeRotationZ( gamma );
-     * m.multiplyMatrices( m1, m2 );
-     * m.multiply( m3 );
-     */
+ * A 4x4 Matrix.
+ *
+ * @example
+ *
+ * var m = new THREE.Matrix4();
+ * var m1 = new THREE.Matrix4();
+ * var m2 = new THREE.Matrix4();
+ * var m3 = new THREE.Matrix4();
+ * var alpha = 0;
+ * var beta = Math.PI;
+ * var gamma = Math.PI/2;
+ * m1.makeRotationX( alpha );
+ * m2.makeRotationY( beta );
+ * m3.makeRotationZ( gamma );
+ * m.multiplyMatrices( m1, m2 );
+ * m.multiply( m3 );
+ */
 
 /*@anonymous*/
 @JS()
 class Matrix4 {
   external factory Matrix4(num n11, num n12, num n13, num n14, num n21, num n22, num n23, num n24, num n31, num n32,
-      num n33, num n34, num n41, num n42, num n43, num n44);
+                           num n33, num n34, num n41, num n42, num n43, num n44);
 
   external List get elements;
   external set elements(List v);
   external Matrix4 set(num n11, num n12, num n13, num n14, num n21, num n22, num n23, num n24, num n31, num n32,
-      num n33, num n34, num n41, num n42, num n43, num n44);
+                       num n33, num n34, num n41, num n42, num n43, num n44);
   external Matrix4 identity();
   external Matrix4 clone();
   external Matrix4 copy(Matrix4 m);
@@ -3127,33 +3134,33 @@ class Matrix4 {
   external Matrix4 makeTranslation(num x, num y, num z);
 
   /**
-         * Sets this matrix as rotation transform around x axis by theta radians.
-         *
-         * @param theta Rotation angle in radians.
-         */
+   * Sets this matrix as rotation transform around x axis by theta radians.
+   *
+   * @param theta Rotation angle in radians.
+   */
   external Matrix4 makeRotationX(num theta);
 
   /**
-         * Sets this matrix as rotation transform around y axis by theta radians.
-         *
-         * @param theta Rotation angle in radians.
-         */
+   * Sets this matrix as rotation transform around y axis by theta radians.
+   *
+   * @param theta Rotation angle in radians.
+   */
   external Matrix4 makeRotationY(num theta);
 
   /**
-         * Sets this matrix as rotation transform around z axis by theta radians.
-         *
-         * @param theta Rotation angle in radians.
-         */
+   * Sets this matrix as rotation transform around z axis by theta radians.
+   *
+   * @param theta Rotation angle in radians.
+   */
   external Matrix4 makeRotationZ(num theta);
 
   /**
-         * Sets this matrix as rotation transform around axis by angle radians.
-         * Based on http:
-         *
-         * @param axis Rotation axis.
-         * @param theta Rotation angle in radians.
-         */
+   * Sets this matrix as rotation transform around axis by angle radians.
+   * Based on http:
+   *
+   * @param axis Rotation axis.
+   * @param theta Rotation angle in radians.
+   */
   external Matrix4 makeRotationAxis(Vector3 axis, num angle);
   external Matrix4 makeScale(num x, num y, num z);
   external Matrix4 compose(Vector3 translation, Quaternion rotation, Vector3 scale);
@@ -3196,14 +3203,14 @@ class Plane {
 }
 
 /**
-     * Implementation of a quaternion. This is used for rotating things without incurring in the dreaded gimbal lock issue, amongst other advantages.
-     *
-     * @example
-     * var quaternion = new THREE.Quaternion();
-     * quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
-     * var vector = new THREE.Vector3( 1, 0, 0 );
-     * vector.applyQuaternion( quaternion );
-     */
+ * Implementation of a quaternion. This is used for rotating things without incurring in the dreaded gimbal lock issue, amongst other advantages.
+ *
+ * @example
+ * var quaternion = new THREE.Quaternion();
+ * quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
+ * var vector = new THREE.Vector3( 1, 0, 0 );
+ * vector.applyQuaternion( quaternion );
+ */
 
 /*@anonymous*/
 @JS()
@@ -3211,11 +3218,11 @@ class Quaternion {
   external factory Quaternion(num x, num y, num z, num w);
 
   /**
-         * @param x x coordinate
-         * @param y y coordinate
-         * @param z z coordinate
-         * @param w w coordinate
-         */
+   * @param x x coordinate
+   * @param y y coordinate
+   * @param z z coordinate
+   * @param w w coordinate
+   */
 
   external num get x;
   external set x(num v);
@@ -3231,10 +3238,10 @@ class Quaternion {
   external Quaternion setFromEuler(Euler euler, bool update);
 
   /**
-         * Sets this quaternion from rotation specified by axis and angle.
-         * Adapted from http:
-         * Axis have to be normalized, angle is in radians.
-         */
+   * Sets this quaternion from rotation specified by axis and angle.
+   * Adapted from http:
+   * Axis have to be normalized, angle is in radians.
+   */
   external Quaternion setFromAxisAngle(Vector3 axis, num angle);
   external Quaternion setFromRotationMatrix(Matrix4 m);
   external Quaternion setFromUnitVectors(Vector3 vFrom, Vector3 vTo);
@@ -3253,7 +3260,7 @@ class Quaternion {
   external List<num> toArray(List<num> xyzw, num offset);
   external void onChange();
 
-  // external static Quaternion slerp(Quaternion qa , Quaternion qb , Quaternion qm , num t );
+// external static Quaternion slerp(Quaternion qa , Quaternion qb , Quaternion qm , num t );
 
 }
 
@@ -3325,10 +3332,10 @@ class SplineControlPoint {
 }
 
 /**
-     * Represents a spline.
-     *
-     * @see <a href="https:
-     */
+ * Represents a spline.
+ *
+ * @see <a href="https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -3339,17 +3346,17 @@ class Spline {
   external set points(List<SplineControlPoint> v);
 
   /**
-         * Initialises using the data in the array as a series of points. Each value in a must be another array with three values, where a[n] is v, the value for the nth point, and v[0], v[1] and v[2] are the x, y and z coordinates of that point n, respectively.
-         *
-         * @param a array of triplets containing x, y, z coordinates
-         */
+   * Initialises using the data in the array as a series of points. Each value in a must be another array with three values, where a[n] is v, the value for the nth point, and v[0], v[1] and v[2] are the x, y and z coordinates of that point n, respectively.
+   *
+   * @param a array of triplets containing x, y, z coordinates
+   */
   external void initFromArray(List<List<num>> a);
 
   /**
-         * Return the interpolated point at k.
-         *
-         * @param k point index
-         */
+   * Return the interpolated point at k.
+   *
+   * @param k point index
+   */
   external SplineControlPoint getPoint(num k);
 
   external List<List<num>> getControlPointsArray();
@@ -3358,25 +3365,25 @@ class Spline {
 		external set m(nu v); # ; */
 
   /**
-         * Modifies the spline so that it looks similar to the original but has its points distributed in such way that moving along the spline it's done at a more or less constant speed. The points should also appear more uniformly spread along the curve.
-         * This is done by resampling the original spline, with the density of sampling controlled by samplingCoef. Here it's interesting to note that denser sampling is not necessarily better: if sampling is too high, you may get weird kinks in curvature.
-         *
-         * @param samplingCoef how mdynamic intermediate values to use between spline points
-         */
+   * Modifies the spline so that it looks similar to the original but has its points distributed in such way that moving along the spline it's done at a more or less constant speed. The points should also appear more uniformly spread along the curve.
+   * This is done by resampling the original spline, with the density of sampling controlled by samplingCoef. Here it's interesting to note that denser sampling is not necessarily better: if sampling is too high, you may get weird kinks in curvature.
+   *
+   * @param samplingCoef how mdynamic intermediate values to use between spline points
+   */
   external void reparametrizeByArcLength(num samplingCoef);
 }
 
 /**
-     * ( export class Vector&lt;T&gt; )
-     *
-     * Abstract export class of Vector2, Vector3 and Vector4.
-     * Currently the members of Vector is NOT type safe because it accepts different typed vectors.
-     * Those definitions will be changed when TypeScript innovates Generics to be type safe.
-     *
-     * @example
-      THREE.Vector = new THREE.Vector3() * var v;
-     * v.addVectors(new THREE.Vector2(0, 1), new THREE.Vector2(2, 3));    
-     */
+ * ( export class Vector&lt;T&gt; )
+ *
+ * Abstract export class of Vector2, Vector3 and Vector4.
+ * Currently the members of Vector is NOT type safe because it accepts different typed vectors.
+ * Those definitions will be changed when TypeScript innovates Generics to be type safe.
+ *
+ * @example
+    THREE.Vector = new THREE.Vector3() * var v;
+ * v.addVectors(new THREE.Vector2(0, 1), new THREE.Vector2(2, 3));
+ */
 
 /*@anonymous*/
 @JS()
@@ -3399,17 +3406,17 @@ class Vector {
   external Vector normalize();
 
   /**
-         * NOTE: Vector4 doesn't have the property.
-         *
-          num * distanceTo(T v );
-         */
+   * NOTE: Vector4 doesn't have the property.
+   *
+      num * distanceTo(T v );
+   */
   external num distanceTo(Vector v);
 
   /**
-         * NOTE: Vector4 doesn't have the property.
-         *
-          num * distanceToSquared(T v );
-         */
+   * NOTE: Vector4 doesn't have the property.
+   *
+      num * distanceToSquared(T v );
+   */
   external num distanceToSquared(Vector v);
   external Vector setLength(num l);
   external Vector lerp(Vector v, num alpha);
@@ -3418,10 +3425,10 @@ class Vector {
 }
 
 /**
-     * 2D vector.
-     *
-     * ( class Vector2  )
-     */
+ * 2D vector.
+ *
+ * ( class Vector2  )
+ */
 
 /*@anonymous*/
 @JS()
@@ -3482,18 +3489,18 @@ class Vector2 {
 }
 
 /**
-     * 3D vector.
-     *
-     * @example
-     * var a = new THREE.Vector3( 1, 0, 0 );
-     * var b = new THREE.Vector3( 0, 1, 0 );
-     * var c = new THREE.Vector3();
-     * c.crossVectors( a, b );
-     *
-     * @see <a href="https:
-     *
-     * ( class Vector3  )
-     */
+ * 3D vector.
+ *
+ * @example
+ * var a = new THREE.Vector3( 1, 0, 0 );
+ * var b = new THREE.Vector3( 0, 1, 0 );
+ * var c = new THREE.Vector3();
+ * c.crossVectors( a, b );
+ *
+ * @see <a href="https:
+ *
+ * ( class Vector3  )
+ */
 
 /*@anonymous*/
 @JS()
@@ -3571,10 +3578,10 @@ class Vector3 {
 }
 
 /**
-     * 4D vector.
-     *
-     * ( class Vector4  )
-     */
+ * 4D vector.
+ *
+ * ( class Vector4  )
+ */
 
 /*@anonymous*/
 @JS()
@@ -3740,8 +3747,8 @@ class LineSegments {
 
 /*@anonymous*/
 @JS()
-class Mesh {
-  external factory Mesh /* extends Object3D */ (BufferGeometry geometry, Material material);
+class Mesh extends Object3D{
+  external factory Mesh /* extends Object3D */ (Geometry geometry, Material material);
 
   external dynamic get geometry;
   external set geometry(dynamic v);
@@ -3755,10 +3762,10 @@ class Mesh {
 }
 
 /**
-     * A class for displaying particles in the form of variable size points. For example, if using the WebGLRenderer, the particles are displayed using GL_POINTS.
-     *
-     * @see <a href="https:
-     */
+ * A class for displaying particles in the form of variable size points. For example, if using the WebGLRenderer, the particles are displayed using GL_POINTS.
+ *
+ * @see <a href="https:
+ */
 
 /*@anonymous*/
 @JS()
@@ -4336,7 +4343,7 @@ class Scene {
 @JS()
 class CanvasTexture {
   external factory CanvasTexture /* extends Texture */ (dynamic canvas, Mapping mapping, Wrapping wrapS, Wrapping wrapT,
-      TextureFilter magFilter, TextureFilter minFilter, PixelFormat format, TextureDataType type, num anisotropy);
+                                                        TextureFilter magFilter, TextureFilter minFilter, PixelFormat format, TextureDataType type, num anisotropy);
 
   external bool get needsUpdate;
   external set needsUpdate(bool v);
@@ -4422,7 +4429,7 @@ class DataTexture {
 @JS()
 class Texture {
   external factory Texture(dynamic image, Mapping mapping, Wrapping wrapS, Wrapping wrapT, TextureFilter magFilter,
-      TextureFilter minFilter, PixelFormat format, TextureDataType type, num anisotropy);
+                           TextureFilter minFilter, PixelFormat format, TextureDataType type, num anisotropy);
 
   external num get id;
   external set id(num v);
@@ -4621,8 +4628,8 @@ class ArcCurve {
 
 /*@anonymous*/
 @JS()
-class CubeGeometry {
-  external factory CubeGeometry() /* extends BoxGeometry */;
+class CubeGeometry extends Geometry{
+  external factory CubeGeometry(num w, num h, num d, [num ws, num hs, num ds]) /* extends BoxGeometry */;
 }
 
 /*@anonymous*/
