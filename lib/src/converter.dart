@@ -38,12 +38,33 @@ class Converter {
     // remove multiline comments
     f = f.replaceAll(new RegExp("\\/\\*\\*[^\\*]+\\*[^\\*\\/]*\\*[^\\*\\/]*\\*[^\\*\\/]*\\/"), "");
     f = f.replaceAll(new RegExp("\\/\\*\\*[^\\*]+\\*[^\\*\\/]*\\*[^\\*\\/]*\\/"), "");
-    // fix an error in three.d.ts source
-    f = f.replaceAll(new RegExp("clip: AnimationClip\n"), "clip: AnimationClip;\n");
+    f = f.replaceAll(new RegExp("\\n\\s*\\*\\s+.*"), "\n");
+    f = f.replaceAll(new RegExp("\\/\\*\\*\\s+\\*\\/"), "");
     // replace multiple type definition (defined by pipe) with 'dynamic' type
-    f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_]+\\s*\\|\\s*[A-Za-z0-9_]+\\s*\\|*\\s*[A-Za-z0-9_]*)"), (Match m) => "dynamic "); // "dynamic /* ${m[1]}  */"
+    f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_\\[\\]]+\\s*\\|\\s*[A-Za-z0-9_\\[\\]]+\\s*\\|*\\s*[A-Za-z0-9_\\[\\]]*)"), (Match m) => "dynamic "); // "dynamic /* ${m[1]}  */"
     // change stuff. before: [name : Foo] : Bar; after: name : Foo;
     f = f.replaceAllMapped(new RegExp("\\[\\s*([A-Za-z0-9_<>]+\\s*:\\s*[A-Za-z0-9_<>]+)\\s*\\]\\s*:\\s*[A-Za-z0-9_<>]+\\s*;"), (Match m) => "${m[1]};");
+
+    // convert function calls in constructors to Func's
+    f = f.replaceAllMapped(new RegExp("(\\w+)\\?*\\s*:\\s*\\(\\s*\\)\\s*=>\\s*void"), (Match m) => "VoidFunc0 ${m[1]}");
+    f = f.replaceAllMapped(new RegExp("(\\w+)\\?*\\s*:\\s*\\(url: string, loaded: number, total: number\\)\\s*=>\\s*void"), (Match m) => "VoidFunc3<String,num,num> ${m[1]}");
+    //func: (u: number, v: number) => Vector3
+    f = f.replaceAllMapped(new RegExp("(\\w+)\\?*\\s*:\\s*\\(u: number, v: number\\)\\s*=>\\s*Vector3"), (Match m) => "Func2<num,num,Vector3> ${m[1]}");
+    // taper?: (u: number) => number
+    f = f.replaceAllMapped(new RegExp("(\\w+)\\?*\\s*:\\s*\\(u: number\\)\\s*=>\\s*number"), (Match m) => "Func1<num,num> ${m[1]}");
+
+    //simplify annoying objects
+    f = f.replaceAllMapped(new RegExp("info:[^}]+\\};[^}]+\\};[^}]+\\};"), (Match m) => "info: dynamic;");
+    f = f.replaceAllMapped(new RegExp("extractAllPoints\\([^}]+\\};"), (Match m) => "extractAllPoints(num points) : dynamic;");
+    f = f.replaceAllMapped(new RegExp("parameters:[^}]+\\};"), (Match m) => "parameters: dynamic;");
+    f = f.replaceAllMapped(new RegExp("WorldUVGenerator:[^}]+\\};"), (Match m) => "WorldUVGenerator: dynamic;");
+
+    // fix errors in three.d.ts source
+    f = f.replaceAll(new RegExp("<T extends Object3D>"), "");
+    f = f.replaceAll(new RegExp(": T;"), ": dynamic;");
+    f = f.replaceAll(new RegExp("clip: AnimationClip\n"), "clip: AnimationClip;\n");
+    f = f.replaceAll(new RegExp("blending\\?: Blending,\\n"), "blending?: Blending;\n");
+    f = f.replaceAllMapped(new RegExp("(CurveUtils:\\s+\\{[^}]+\\})"), (Match m) => "${m[1]}"); // "dynamic /* ${m[1]}  */"
     return f;
   }
 
@@ -62,18 +83,22 @@ class Converter {
     f = f.replaceAllMapped(new RegExp("export\\s+interface\\s+"), (Match m) => "export class ");
     // convert interface to class so that the RegEx below will deal with it
     f = f.replaceAllMapped(new RegExp("interface\\s+"), (Match m) => "export class ");
-    //TODO class VideoTexture --> export class VideoTexture
+    f = f.replaceAllMapped(new RegExp("\\n\\s*class"), (Match m) => "\nexport class ");
     return f;
   }
 
   /* --------- TYPES */
   String _convertTypes(String f) {
+    f = f.replaceAll(new RegExp("HTMLCanvasElement"), "CanvasElement");
+    f = f.replaceAll(new RegExp("HTMLImageElement"), "ImageElement");
+    f = f.replaceAll(new RegExp("HTMLVideoElement"), "VideoElement");
     f = f.replaceAll(new RegExp("any"), "dynamic");
     f = f.replaceAll(new RegExp("number"), "num");
     f = f.replaceAll(new RegExp("boolean"), "bool");
     f = f.replaceAll(new RegExp("string"), "String");
     f = f.replaceAll(new RegExp("Array<"), "List<");
     f = f.replaceAll(new RegExp("\\{\\}\\[\\]"), "List");
+    f = f.replaceAll(new RegExp("Float32Array"), "List");
     return f;
   }
 
@@ -104,7 +129,7 @@ class Converter {
     f = f.replaceAllMapped(new RegExp("(.*)\\s*:\\s*\\{(.*)\\}(.*);"), (Match m) => "/* ${m[1]} #${m[2]}# ${m[3]}; */");
 
     f = f.replaceAllMapped(
-        new RegExp("(\\s*)export\\s+class\\s+([A-Za-z0-9.]+)\\s+(extends\\s+\\w+)*\\s*\\{([^}]+)\\}\n"), (Match m) {
+        new RegExp("(\\s*)export\\s+class\\s+([A-Za-z0-9_<>]+)([^{]*)\\{([^}]+)\\}\n"), (Match m) {
       String constructor = "";
 
       // get arguments from constructor
@@ -112,14 +137,20 @@ class Converter {
 
       // modify constructor var definition positions
       constructor = constructor.replaceAllMapped(
-          new RegExp("([A-Za-z0-9_]+)\\s*\\?*\\s*:\\s*([^,\\)]+)"), (Match n) => "${n[2]} ${n[1]}");
+          new RegExp("([A-Za-z0-9_<>]+)\\s*\\?*\\s*:\\s*([^,\\)]+)"), (Match n) => "${n[2]} ${n[1]}");
+      // make arguments optional
+      constructor = constructor.replaceAllMapped(
+          new RegExp("\\((.*)\\)"), (Match n) => "([ ${n[1]} ])");
+
+      constructor = constructor.replaceAllMapped(
+          new RegExp("\\(\\[\\s*\\]\\)"), (Match n) => "()");
 
       // remove constructor string
-      String body = m[4].replaceAll(new RegExp("constructor\\s*\\([^;]+\\s*;"), "");
+      String body = m[4].replaceAll(new RegExp("constructor\\s*\\([^;]+;"), "");
 
-      return "${m[1]}\n@anonymous\n@JS()\nclass ${m[2]} {\n\texternal factory ${m[2]} ${m[3] == null
-                                                                               ? ""
-                                                                               : "/* ${m[3]} */"}${constructor};\n${body}\n}\n";
+      return "${m[1]}\n@JS()\nclass ${m[2]} ${m[3] == null
+                                              ? ""
+                                              : "${m[3]}"} {\n\texternal factory ${m[2]} ${constructor};\n${body}\n}\n";
     });
     return f;
   }
@@ -138,10 +169,8 @@ class Converter {
     // f.ex. foo : number --> number foo
     f = f.replaceAllMapped(new RegExp("(\\s*)(.*)\\s*:\\s*(.*)\\s*;"),
         (Match m) => m[2].startsWith("/*") ? m[0] : "${m[1]} ${m[3]} ${m[2]};");
-    //fix statics:
 
-    //aus: AnimationClip external static CreateFromMorphTargetSequence( String name , List<MorphTarget> morphTargetSequence , num fps );
-    //an: static external AnimationClip CreateFromMorphTargetSequence( String name , List<MorphTarget> morphTargetSequence , num fps );
+    //fix statics:
     f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_\\[\\]]*)\\s+static\\s+"), (Match m) => "static ${m[1]} ");
 
     // Convert type definition position in function parameter definition
@@ -151,7 +180,6 @@ class Converter {
 
     // Convert typed array to typed List
     // f.ex. number[] --> List<number>
-    f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_]+)\\[\\]"), (Match m) => "List<${m[1]}>");
     return f;
   }
 
@@ -184,6 +212,12 @@ class Converter {
       searchRegex = new RegExp("(external\\s+factory[^;]+;\\s*)([^}]+)\\}");
     }
 
+    // []
+    f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_<>]+)\\[\\]"), (Match m) => "List<${m[1]}>");
+    f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_]+)\\[\\]"), (Match m) => "List<${m[1]}>");
+    f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_<>]+)\\[\\]"), (Match m) => "List<${m[1]}>");
+    f = f.replaceAllMapped(new RegExp("([A-Za-z0-9_<>]+)\\[\\]"), (Match m) => "List<${m[1]}>");
+
     // Fields to class getters/setters
     f = f.replaceAllMapped(searchRegex, (Match m) {
       // prefix all members that are not functions with 'external' and add 'get'
@@ -195,6 +229,9 @@ class Converter {
       //prefix all functions with 'external'
       intrnl = intrnl.replaceAllMapped(
           new RegExp("([A-Za-z0-9_<>]*\\s*[A-Za-z0-9_<>]+\\s+[A-Za-z0-9_<>]+\\(.*\\))\\s*;"), (Match n) => "external ${n[1]};");
+
+      // static external --> external static
+      intrnl = intrnl.replaceAll(new RegExp("static\\s+external"), "external static");
 
       //create setters
       intrnl = intrnl.replaceAllMapped(new RegExp("external\\s+([A-Za-z0-9_<>]+)\\s+get\\s+([A-Za-z0-9_]+)\\s*;"),
@@ -260,7 +297,7 @@ class Converter {
             new RegExp("([A-Za-z0-9_]+)\\s+([A-Za-z0-9_]+)\\s*;"), (Match n) => "\nexternal ${n[1]} get ${n[2]};");
       });
 
-      f = f.replaceAllMapped(new RegExp("@anonymous\\s*(@JS\\(\\)\\s*class\\s+${lib_name}\\s*\\{)"),
+      f = f.replaceAllMapped(new RegExp("(@JS\\(\\)\\s*class\\s+${lib_name}\\s*\\{)"),
           (Match m) => "${m[1]}\n\t${insert}\n");
     }
 
@@ -277,49 +314,50 @@ class Converter {
       // fix bad factory definitions
       f = f.replaceAllMapped(new RegExp("external\\s+factory\\s+([A-Za-z0-9_]+)\\s*;"), (Match m) => "external factory ${m[1]}();");
       // fix double definition of ShaderChunk (three.js)
+      f = f.replaceAll(new RegExp("export enum"), "enum");
       f = f.replaceAll(new RegExp("external int get ShaderChunk;"), "");
+      f = f.replaceAll(new RegExp("CurvePath<T \\(\\);"), "CurvePath ();");
+      // fix Vector extends
+      f = f.replaceAllMapped(new RegExp("(class Vector\\d)"), (Match m) => "${m[1]} extends Vector");
 
       // fix functions as parameters
-      f = f.replaceAll(new RegExp("listener\\(dynamic event \\) : void"), "Func1<dynamic, void> listener");
-      f = f.replaceAll(new RegExp("onLoad\\(Texture texture \\) : void"), "Func1<Texture, void> onLoad");
-      f = f.replaceAll(new RegExp("onError\\(String message \\) : void"), "Func1<String, void> onError");
+      f = f.replaceAllMapped(new RegExp("(\\w+)\\s*\\((\\w+)\\s+\\w+\\s*\\)\\s*:\\s*void"), (Match m) => "VoidFunc1<${m[2]}> ${m[1]}");
+      //onLoad(Geometry geometry , List<Material> materials ) : void
+      f = f.replaceAllMapped(new RegExp("(\\w+)\\s*\\(([A-Za-z0-9_<>]+)\\s+\\w+\\s*,\\s*([A-Za-z0-9_<>]+)\\s+\\w+\\s*\\)\\s*:\\s*void"), (Match m) => "VoidFunc2<${m[2]},${m[3]}> ${m[1]}");
 
-    /*
-    TODO for three.js
+      // comment this: WebGLObjectsInstance new (dynamic gl , dynamic properties , dynamic info );
+      // happens because constructor is not named the same as class
+      f = f.replaceAllMapped(new RegExp("(\\w+)\\s*new\\s*(\\(.*)"), (Match m) => "/* external factory ${m[1]} ${m[2]} */");
 
-onLoad(String responseText ) : void, onProgress(dynamic event ) : void, onError(dynamic event ) : void
+      //kill some stuff
+      f = f.replaceAllMapped(new RegExp("(export var CurveUtils[^}]+\\})"), (Match m) => "/* already defined */");
+      // delete things at end of three js
+      f = f.replaceAll(new RegExp("\\}\\s*declare[^;]+;"), "");
+      f = f.replaceAll(new RegExp("computed\\s+beforehand\\.\\s+\\*\\/"), "");
+      f = f.replaceAll(new RegExp("external int get (Cache|Math);"), "");
+      f = f.replaceAll(new RegExp("dynamic addAttribute\\(String name , dynamic array , num itemSize \\);external"), "");
+      f = f.replaceAll(new RegExp("clone<T>\\(T"), "clone(Object3D");
+      f = f.replaceAll(new RegExp("external Func0<dynamic> get toJSON;"), "//external Func0<dynamic> get toJSON;");
+      f = f.replaceAll(new RegExp("enum LineMode[^;]+;[^;]+;"), "enum LineMode { dummy }");
+      f = f.replaceAll(new RegExp("Curve<T ;"), "Curve();");
+      f = f.replaceAll(new RegExp("external\\s+(BufferAttribute|InterleavedBuffer|Material) clone\\(\\);"), "");
+      f = f.replaceAll(new RegExp("external\\s+Color set\\(Color color \\);"), "");
+      f = f.replaceAll(new RegExp("external\\s+Color set\\(String color \\);"), "");
+      f = f.replaceAll(new RegExp("external\\s+Matrix3 getInverse\\(Matrix4 matrix , bool throwOnInvertible \\);"), "");
+      f = f.replaceAll(new RegExp("external\\s+Quaternion fromArray\\(List<num> xyzw , num offset \\);"), "");
+      f = f.replaceAll(new RegExp("external\\s+List<num> toArray\\(List<num> xyzw , num offset \\);"), "");
+      f = f.replaceAll(new RegExp("external static Quaternion slerp\\(Quaternion qa , Quaternion qb , Quaternion qm , num t \\);"), "");
+      f = f.replaceAll(new RegExp("external static Vector3 (normal|barycoordFromPoint).*"), "");
+      f = f.replaceAll(new RegExp("external static bool containsPoint.*"), "");
+      f = f.replaceAll(new RegExp("Vector3 addScaledVector\\( Vector3 v , num s \\);external"), "");
+      f = f.replaceAll(new RegExp("external\\s+void add\\(Object3D obj \\);"), "");
+      f = f.replaceAll(new RegExp("external\\s+void setClearColor\\(Color color , num alpha \\);"), "");
+      f = f.replaceAll(new RegExp("external\\s+void setClearColor\\(num color , num alpha \\);"), "");
+      f = f.replaceAll(new RegExp("T getPointAt"), "Vector getPointAt");
+      f = f.replaceAll(new RegExp("List<T>"), "List<Vector>");
+      f = f.replaceAll(new RegExp("<\\s*T\\s*extends\\s*Vector\\s*>"), "");
+      f = f.replaceAll(new RegExp("@JS\\(\\)\\s*class MeshLambertMaterialParameters"), "@anonymous\n@JS()\nclass MeshLambertMaterialParameters");
 
-    listener(dynamic event ) : void
-    [][]
-    num|String|foo definitions
-
-    void load(String url , onLoad(DataTexture dataTexture ) : void, onProgress(dynamic event ) : void, onError(dynamic event ) : void);
-    load(url: string, onLoad?: (geometry: Geometry, materials: Material[]) => void, onProgress?: (event: any) => void, onError?: (event: any) => void): void;
-
-    parse(dynamic json , String texturePath ) # geometry: Geometry; materials: List<Material> # ;
-    parse(json: any, texturePath?: string): { geometry: Geometry; materials?: Material[] };
-
-    textures # [key:String]:Texture # ;
-    setTextures(textures # [key:String]:Texture # ): void;
-
-    interface
-
-    enum hack
-
-        info: {
-            memory: {
-                 num programs;
-                 num geometries;
-                 num textures;
-            };
-            render: {
-                 num calls;
-                 num vertices;
-                 num faces;
-                 num points;
-            };
-        };
-     */
 
       return f;
   }
