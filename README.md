@@ -1,4 +1,4 @@
-# TypeScript to Dart type definition converter
+# TypeScript definition to Dart JS interop facade converter
 
 # Installation
 

@@ -1,9 +1,10 @@
 @JS('THREE')
-library threejs;
+library three;
 
 import "package:func/func.dart";
 import "package:js/js.dart";
 import 'dart:html';
+import 'dart:web_audio' show AudioContext;
 
 external int get REVISION;
 
@@ -149,16 +150,13 @@ external int get LoopPingPong;
 //void export function log(dynamic message , ...List<dynamic> optionalParams );
 
 @JS()
-class WebGLRenderer implements Renderer{
-  external factory WebGLRenderer([WebGLRendererParameters parameters]);
-  external void setSize(num width , num height );
-  external CanvasElement get domElement;
-}
-
-/*@anonymous*/
-@JS()
 class AnimationAction {
-  external factory AnimationAction(AnimationClip clip, num startTime, num timeScale, num weight, bool loop);
+  external factory AnimationAction(
+      [AnimationClip clip,
+      num startTime,
+      num timeScale,
+      num weight,
+      bool loop]);
 
   external AnimationClip get clip;
   external set clip(AnimationClip v);
@@ -192,10 +190,10 @@ class AnimationAction {
   external num getWeightAt(num time);
 }
 
-/*@anonymous*/
 @JS()
 class AnimationClip {
-  external factory AnimationClip(String name, num duration, List<KeyframeTrack> tracks);
+  external factory AnimationClip(
+      [String name, num duration, List<KeyframeTrack> tracks]);
 
   external String get name;
   external set name(String v);
@@ -212,15 +210,16 @@ class AnimationClip {
   external static AnimationClip CreateFromMorphTargetSequence(
       String name, List<MorphTarget> morphTargetSequence, num fps);
   external AnimationClip findByName(AnimationClip clipArray, String name);
-  external static List<AnimationClip> CreateClipsFromMorphTargetSequences(List<MorphTarget> morphTargets, num fps);
+  external static List<AnimationClip> CreateClipsFromMorphTargetSequences(
+      List<MorphTarget> morphTargets, num fps);
   external AnimationClip parse(dynamic json);
-  external AnimationClip parseAnimation(dynamic animation, List<Bone> bones, String nodeName);
+  external AnimationClip parseAnimation(
+      dynamic animation, List<Bone> bones, String nodeName);
 }
 
-/*@anonymous*/
 @JS()
 class AnimationMixer {
-  external factory AnimationMixer(dynamic root);
+  external factory AnimationMixer([dynamic root]);
 
   external dynamic get root;
   external set root(dynamic v);
@@ -236,22 +235,26 @@ class AnimationMixer {
   external AnimationMixer removeAllActions();
   external AnimationMixer removeAction(AnimationAction action);
   external AnimationAction findActionByName(String name);
-  external AnimationMixer play(AnimationAction action, num optionalFadeInDuration);
+  external AnimationMixer play(
+      AnimationAction action, num optionalFadeInDuration);
   external AnimationMixer fadeOut(AnimationAction action, num duration);
   external AnimationMixer fadeIn(AnimationAction action, num duration);
   external AnimationMixer warp(
-      AnimationAction action, NumberKeyframeTrack startTimeScale, NumberKeyframeTrack endTimeScale, num duration);
-  external AnimationMixer crossFade(
-      AnimationAction fadeOutAction, AnimationAction fadeInAction, num duration, bool warp);
+      AnimationAction action,
+      NumberKeyframeTrack startTimeScale,
+      NumberKeyframeTrack endTimeScale,
+      num duration);
+  external AnimationMixer crossFade(AnimationAction fadeOutAction,
+      AnimationAction fadeInAction, num duration, bool warp);
   external AnimationMixer update(num deltaTime);
 }
 
-/*@anonymous*/
 @JS()
 class AnimationUtils {
   external factory AnimationUtils();
 
   external bool getEqualsFunc(dynamic exemplarValue);
+  external dynamic clone(Object3D exemplarValue);
   external dynamic lerp(dynamic a, dynamic b, num alpha, bool interTrack);
   external dynamic lerp_object(dynamic a, dynamic b, num alpha);
   external dynamic slerp_object(dynamic a, dynamic b, num alpha);
@@ -263,10 +266,9 @@ class AnimationUtils {
   external Function getLerpFunc(dynamic exemplarValue, bool interTrack);
 }
 
-/*@anonymous*/
 @JS()
 class KeyframeTrack {
-  external factory KeyframeTrack(String name, List<dynamic> keys);
+  external factory KeyframeTrack([String name, List<dynamic> keys]);
 
   external String get name;
   external set name(String v);
@@ -285,10 +287,9 @@ class KeyframeTrack {
   external dynamic GetTrackTypeForTypeName(String typeName);
 }
 
-/*@anonymous*/
 @JS()
 class PropertyBinding {
-  external factory PropertyBinding(dynamic rootNode, String trackName);
+  external factory PropertyBinding([dynamic rootNode, String trackName]);
 
   external dynamic get rootNode;
   external set rootNode(dynamic v);
@@ -325,10 +326,9 @@ class PropertyBinding {
   external dynamic findNode(dynamic root, String nodeName);
 }
 
-/*@anonymous*/
 @JS()
-class BooleanKeyframeTrack {
-  external factory BooleanKeyframeTrack /* extends KeyframeTrack */ (String name, List<dynamic> keys);
+class BooleanKeyframeTrack extends KeyframeTrack {
+  external factory BooleanKeyframeTrack([String name, List<dynamic> keys]);
 
   external dynamic get result;
   external set result(dynamic v);
@@ -339,7 +339,6 @@ class BooleanKeyframeTrack {
   external BooleanKeyframeTrack parse(dynamic json);
 }
 
-/*@anonymous*/
 @JS()
 class NumberKeyframeTrack {
   external factory NumberKeyframeTrack();
@@ -353,7 +352,6 @@ class NumberKeyframeTrack {
   external NumberKeyframeTrack parse(dynamic json);
 }
 
-/*@anonymous*/
 @JS()
 class QuaternionKeyframeTrack {
   external factory QuaternionKeyframeTrack();
@@ -367,7 +365,6 @@ class QuaternionKeyframeTrack {
   external QuaternionKeyframeTrack parse(dynamic json);
 }
 
-/*@anonymous*/
 @JS()
 class StringKeyframeTrack {
   external factory StringKeyframeTrack();
@@ -381,7 +378,6 @@ class StringKeyframeTrack {
   external StringKeyframeTrack parse(dynamic json);
 }
 
-/*@anonymous*/
 @JS()
 class VectorKeyframeTrack {
   external factory VectorKeyframeTrack();
@@ -395,10 +391,9 @@ class VectorKeyframeTrack {
   external VectorKeyframeTrack parse(dynamic json);
 }
 
-/*@anonymous*/
 @JS()
-class Camera {
-  external factory Camera /* extends Object3D */ ();
+class Camera extends Object3D {
+  external factory Camera();
 
   external Matrix4 get matrixWorldInverse;
   external set matrixWorldInverse(Matrix4 v);
@@ -411,40 +406,19 @@ class Camera {
   external Camera copy(Camera camera);
 }
 
-/*@anonymous*/
 @JS()
-class CubeCamera {
-  external factory CubeCamera /* extends Object3D */ (num near, num far, num cubeResolution);
+class CubeCamera extends Object3D {
+  external factory CubeCamera([num near, num far, num cubeResolution]);
 
   external WebGLRenderTargetCube get renderTarget;
   external set renderTarget(WebGLRenderTargetCube v);
   external void updateCubeMap(Renderer renderer, Scene scene);
 }
 
-/**
- * Camera with orthographic projection
- *
- * @example
- * var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
- * scene.add( camera );
- *
- * @see <a href="https:
- */
-
-/*@anonymous*/
 @JS()
-class OrthographicCamera {
-  external factory OrthographicCamera /* extends Camera */ (
-      num left, num right, num top, num bottom, num near, num far);
-
-  /**
-   * @param left Camera frustum left plane.
-   * @param right Camera frustum right plane.
-   * @param top Camera frustum top plane.
-   * @param bottom Camera frustum bottom plane.
-   * @param near Camera frustum near plane.
-   * @param far Camera frustum far plane.
-   */
+class OrthographicCamera extends Camera {
+  external factory OrthographicCamera(
+      [num left, num right, num top, num bottom, num near, num far]);
 
   external num get zoom;
   external set zoom(num v);
@@ -472,27 +446,9 @@ class OrthographicCamera {
   external dynamic toJSON(dynamic meta);
 }
 
-/**
- * Camera with perspective projection.
- *
- * # example
- *     var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
- *     scene.add( camera );
- *
- * @source https:
- */
-
-/*@anonymous*/
 @JS()
-class PerspectiveCamera {
-  external factory PerspectiveCamera /* extends Camera */ (num fov, num aspect, num near, num far);
-
-  /**
-   * @param fov Camera frustum vertical field of view. Default value is 50.
-   * @param aspect Camera frustum aspect ratio. Default value is 1.
-   * @param near Camera frustum near plane. Default value is 0.1.
-   * @param far Camera frustum far plane. Default value is 2000.
-   */
+class PerspectiveCamera extends Camera {
+  external factory PerspectiveCamera([num fov, num aspect, num near, num far]);
 
   external num get zoom;
   external set zoom(num v);
@@ -508,65 +464,18 @@ class PerspectiveCamera {
 
   external num get far;
   external set far(num v);
-
-  /**
-   * Uses focal length (in mm) to estimate and set FOV 35mm (fullframe) camera is used if frame size is not specified.
-   * Formula based on http:
-   * @param focalLength focal length
-   * @param frameHeight frame size. Default value is 24.
-   */
   external void setLens(num focalLength, num frameHeight);
-
-  /**
-   * Sets an offset in a larger frustum. This is useful for multi-window or multi-monitor/multi-machine setups.
-   * For example, if you have 3x2 monitors and each monitor is 1920x1080 and the monitors are in grid like this:
-   *
-   *     +---+---+---+
-   *     | dynamic  |
-   *     +---+---+---+
-   *     | dynamic  |
-   *     +---+---+---+
-   *
-   * then for each monitor you would call it like this:
-   *
-   *     var w = external 192 get 0;
-      external set 0(192 v);
-   *     var h = external 108 get 0;
-      external set 0(108 v);
-   *     var fullWidth = w * 3;
-   *     var fullHeight = h * 2;
-   *
-   *
-   *     camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
-   *
-   *     camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
-   *
-   *     camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
-   *
-   *     camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
-   *
-   *     camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
-   *
-   *     camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h ); Note there is no reason monitors have to be the same size or in a grid.
-   *
-   * @param fullWidth full width of multiview setup
-   * @param fullHeight full height of multiview setup
-   * @param x horizontal offset of subcamera
-   * @param y vertical offset of subcamera
-   * @param width width of subcamera
-   * @param height height of subcamera
-   */
-  external void setViewOffset(num fullWidth, num fullHeight, num x, num y, num width, num height);
+  external void setViewOffset(
+      num fullWidth, num fullHeight, num x, num y, num width, num height);
   external void updateProjectionMatrix();
   external PerspectiveCamera clone();
   external PerspectiveCamera copy(PerspectiveCamera source);
   external dynamic toJSON(dynamic meta);
 }
 
-/*@anonymous*/
 @JS()
 class BufferAttribute {
-  external factory BufferAttribute(List<num> array, num itemSize);
+  external factory BufferAttribute([List<num> array, num itemSize]);
 
   external String get uuid;
   external set uuid(String v);
@@ -588,9 +497,9 @@ class BufferAttribute {
   external num get count;
   external set count(num v);
   external BufferAttribute setDynamic(bool dynamic);
-  external BufferAttribute clone();
   external BufferAttribute copy(BufferAttribute source);
-  external BufferAttribute copyAt(num index1, BufferAttribute attribute, num index2);
+  external BufferAttribute copyAt(
+      num index1, BufferAttribute attribute, num index2);
   external BufferAttribute copyArray(List<num> array);
 /*         copyColorsArray(colors #num r , num g , b:num# []): external BufferAttribut get e;
 		external set e(BufferAttribut v); */
@@ -616,69 +525,51 @@ class BufferAttribute {
   external BufferAttribute setXYZW(num index, num x, num y, num z, num w);
 }
 
-/*@anonymous*/
 @JS()
-class Int8Attribute {
-  external factory Int8Attribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Int8Attribute extends BufferAttribute {
+  external factory Int8Attribute([dynamic array, num itemSize]);
 }
 
-/*@anonymous*/
 @JS()
-class Uint8Attribute {
-  external factory Uint8Attribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Uint8Attribute extends BufferAttribute {
+  external factory Uint8Attribute([dynamic array, num itemSize]);
 }
 
-/*@anonymous*/
 @JS()
-class Uint8ClampedAttribute {
-  external factory Uint8ClampedAttribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Uint8ClampedAttribute extends BufferAttribute {
+  external factory Uint8ClampedAttribute([dynamic array, num itemSize]);
 }
 
-/*@anonymous*/
 @JS()
-class Int16Attribute {
-  external factory Int16Attribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Int16Attribute extends BufferAttribute {
+  external factory Int16Attribute([dynamic array, num itemSize]);
 }
 
-/*@anonymous*/
 @JS()
-class Uint16Attribute {
-  external factory Uint16Attribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Uint16Attribute extends BufferAttribute {
+  external factory Uint16Attribute([dynamic array, num itemSize]);
 }
 
-/*@anonymous*/
 @JS()
-class Int32Attribute {
-  external factory Int32Attribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Int32Attribute extends BufferAttribute {
+  external factory Int32Attribute([dynamic array, num itemSize]);
 }
 
-/*@anonymous*/
 @JS()
-class Uint32Attribute {
-  external factory Uint32Attribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Uint32Attribute extends BufferAttribute {
+  external factory Uint32Attribute([dynamic array, num itemSize]);
 }
 
-/*@anonymous*/
 @JS()
-class Float32Attribute {
-  external factory Float32Attribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Float32Attribute extends BufferAttribute {
+  external factory Float32Attribute([dynamic array, num itemSize]);
 }
 
-/*@anonymous*/
 @JS()
-class Float64Attribute {
-  external factory Float64Attribute /* extends BufferAttribute */ (dynamic array, num itemSize);
+class Float64Attribute extends BufferAttribute {
+  external factory Float64Attribute([dynamic array, num itemSize]);
 }
 
-/**
- * This is a superefficent class for geometries because it saves all data in buffers.
- * It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the nessecary buffer calculations.
- * It is mainly interesting when working static with objects.
- *
- * @see <a href="https:
- */
-
-/*@anonymous*/
 @JS()
 class BufferGeometry {
   external factory BufferGeometry();
@@ -710,8 +601,8 @@ class BufferGeometry {
   external BufferAttribute getIndex();
   external void setIndex(BufferAttribute index);
 
-  /** Deprecated. This overloaded method is deprecated. */ external dynamic addAttribute(
-      String name, dynamic array, num itemSize);
+  /** Deprecated. This overloaded method is deprecated. */ external void
+      addAttribute(String name, dynamic attribute);
   external dynamic getAttribute(String name);
   external void removeAttribute(String name);
 
@@ -722,7 +613,8 @@ class BufferGeometry {
   external Func0<dynamic> get offsets;
   external set offsets(Func0<dynamic> v);
 
-  /** Deprecated. Use addGroup */ external void addDrawCall(num start, num count, num index);
+  /** Deprecated. Use addGroup */ external void addDrawCall(
+      num start, num count, num index);
   /** Deprecated. */ external void clearDrawCalls();
   external void addGroup(num start, num count, num materialIndex);
   external void clearGroups();
@@ -746,12 +638,11 @@ class BufferGeometry {
   external void computeOffsets(num size);
   external BufferGeometry merge(BufferGeometry geometry, num offset);
   external void normalizeNormals();
-  external Func0<dynamic> get toJSON;
+  //external Func0<dynamic> get toJSON;
   external set toJSON(Func0<dynamic> v);
   external BufferGeometry clone();
   external BufferGeometry copy(BufferGeometry source);
   external void dispose();
-
   external void addEventListener(String type, VoidFunc1<dynamic> listener);
   external void hasEventListener(String type, VoidFunc1<dynamic> listener);
   external void removeEventListener(String type, VoidFunc1<dynamic> listener);
@@ -762,7 +653,6 @@ class BufferGeometry {
 
 }
 
-/*@anonymous*/
 @JS()
 class Channels {
   external factory Channels();
@@ -775,16 +665,9 @@ class Channels {
   external void disable(num channel);
 }
 
-/**
- * Object for keeping track of time.
- *
- * @see <a href="https:
- */
-
-/*@anonymous*/
 @JS()
 class Clock {
-  external factory Clock(bool autoStart);
+  external factory Clock([bool autoStart]);
 
   external bool get autoStart;
   external set autoStart(bool v);
@@ -806,7 +689,6 @@ class Clock {
   external num getDelta();
 }
 
-/*@anonymous*/
 @JS()
 class DirectGeometry {
   external factory DirectGeometry();
@@ -867,56 +749,12 @@ class DirectGeometry {
 
 }
 
-/**
- * JavaScript events for custom objects
- *
- * # Example
- *     var Car = function () {
- *
- *         EventDispatcher.call( this );
- *         this.start = function () {
- *
-    'vroom vroom!' } ) *             this.dispatchEvent( { type: 'start', message;
- *
- *         };
- *
- *     };
- *
- *     var car = new Car();
- *     car.addEventListener( 'start', function ( event ) {
- *
- *         alert( event.message );
- *
- *     } );
- *     car.start();
- *
- * @source src/core/EventDispatcher.js
- */
-
-/*@anonymous*/
 @JS()
 class EventDispatcher {
   external factory EventDispatcher();
 
-  /**
-   * Adds a listener to an event type.
-   * @param type The type of the listener that gets removed.
-   * @param listener The listener function that gets removed.
-   */
   external void addEventListener(String type, VoidFunc1<dynamic> listener);
-
-  /**
-   * Adds a listener to an event type.
-   * @param type The type of the listener that gets removed.
-   * @param listener The listener function that gets removed.
-   */
   external void hasEventListener(String type, VoidFunc1<dynamic> listener);
-
-  /**
-   * Removes a listener from an event type.
-   * @param type The type of the listener that gets removed.
-   * @param listener The listener function that gets removed.
-   */
   external void removeEventListener(String type, VoidFunc1<dynamic> listener);
 
 /*         dispatchEvent(event # type: external Strin get g;
@@ -926,30 +764,15 @@ class EventDispatcher {
 
 }
 
-/**
- * Triangle face.
- *
- * # Example
- *     var normal = new THREE.Vector3( 0, 1, 0 );
- *     var color = new THREE.Color( 0xffaa00 );
- *     var face = new THREE.Face3( 0, 1, 2, normal, color, 0 );
- *
- * @source https:
- */
-
-/*@anonymous*/
 @JS()
 class Face3 {
-  external factory Face3(num a, num b, num c, List<Vector3> vertexNormals, List<Color> vertexColors, num materialIndex);
-
-  /**
-   * @param a Vertex A index.
-   * @param b Vertex B index.
-   * @param c Vertex C index.
-   * @param normal Face normal or array of vertex normals.
-   * @param color Face color or array of vertex colors.
-   * @param materialIndex Material index.
-   */
+  external factory Face3(
+      [num a,
+      num b,
+      num c,
+      List<Vector3> vertexNormals,
+      List<Color> vertexColors,
+      num materialIndex]);
 
   external num get a;
   external set a(num v);
@@ -980,7 +803,6 @@ class Face3 {
   external Face3 clone();
 }
 
-/*@anonymous*/
 @JS()
 class MorphTarget {
   external factory MorphTarget();
@@ -991,7 +813,6 @@ class MorphTarget {
   external set vertices(List<Vector3> v);
 }
 
-/*@anonymous*/
 @JS()
 class MorphColor {
   external factory MorphColor();
@@ -1002,7 +823,6 @@ class MorphColor {
   external set colors(List<Color> v);
 }
 
-/*@anonymous*/
 @JS()
 class MorphNormals {
   external factory MorphNormals();
@@ -1013,7 +833,6 @@ class MorphNormals {
   external set normals(List<Vector3> v);
 }
 
-/*@anonymous*/
 @JS()
 class BoundingSphere {
   external factory BoundingSphere();
@@ -1022,70 +841,124 @@ class BoundingSphere {
   external set radius(num v);
 }
 
-/**
- * Base class for geometries
- *
- * # Example
- *     var geometry = new THREE.Geometry();
- *     geometry.vertices.push( new THREE.Vector3( -10, 10, 0 ) );
- *     geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
- *     geometry.vertices.push( new THREE.Vector3( 10, -10, 0 ) );
- *     geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
- *     geometry.computeBoundingSphere();
- *
- * @see https:
- */
-
-/*@anonymous*/
 @JS()
 class Geometry {
   external factory Geometry();
 
   external num get id;
-
   external set id(num v);
 
   external String get uuid;
-
   external set uuid(String v);
 
   external String get name;
-
   external set name(String v);
 
   external String get type;
-
   external set type(String v);
 
   external List<Vector3> get vertices;
-
   external set vertices(List<Vector3> v);
 
-  /**
-   * Array of vertex colors, matching num and order of vertices.
-   * Used in ParticleSystem, Line and Ribbon.
-   * Meshes use per-face-use-of-vertex colors embedded directly in faces.
-   * To signal an update in this array, Geometry.colorsNeedUpdate needs to be set to true.
-   */
   external List<Color> get colors;
-
   external set colors(List<Color> v);
 
-  /**
-   * Array of triangles or/and quads.
-   * The array of faces describe how each vertex in the model is connected with each other.
-   * To signal an update in this array, Geometry.elementsNeedUpdate needs to be set to true.
-   */
   external List<Face3> get faces;
-
   external set faces(List<Face3> v);
+
+  external List<List<List<Vector2>>> get faceVertexUvs;
+  external set faceVertexUvs(List<List<List<Vector2>>> v);
+
+  external List<MorphTarget> get morphTargets;
+  external set morphTargets(List<MorphTarget> v);
+
+  external List<MorphNormals> get morphNormals;
+  external set morphNormals(List<MorphNormals> v);
+
+  external List<num> get skinWeights;
+  external set skinWeights(List<num> v);
+
+  external List<num> get skinIndices;
+  external set skinIndices(List<num> v);
+
+  external List<num> get lineDistances;
+  external set lineDistances(List<num> v);
+
+  external Box3 get boundingBox;
+  external set boundingBox(Box3 v);
+
+  external BoundingSphere get boundingSphere;
+  external set boundingSphere(BoundingSphere v);
+
+  external bool get verticesNeedUpdate;
+  external set verticesNeedUpdate(bool v);
+
+  external bool get elementsNeedUpdate;
+  external set elementsNeedUpdate(bool v);
+
+  external bool get uvsNeedUpdate;
+  external set uvsNeedUpdate(bool v);
+
+  external bool get normalsNeedUpdate;
+  external set normalsNeedUpdate(bool v);
+
+  external bool get colorsNeedUpdate;
+  external set colorsNeedUpdate(bool v);
+
+  external bool get lineDistancesNeedUpdate;
+  external set lineDistancesNeedUpdate(bool v);
+
+  external bool get groupsNeedUpdate;
+  external set groupsNeedUpdate(bool v);
+  external void applyMatrix(Matrix4 matrix);
+  external Geometry rotateX(num angle);
+  external Geometry rotateY(num angle);
+  external Geometry rotateZ(num angle);
+  external Geometry translate(num x, num y, num z);
+  external Geometry scale(num x, num y, num z);
+  external void lookAt(Vector3 vector);
+  external Geometry fromBufferGeometry(BufferGeometry geometry);
+  external Vector3 center();
+  external Geometry normalize();
+  external void computeFaceNormals();
+
+  external void computeVertexNormals(bool areaWeighted);
+  external void computeMorphNormals();
+  external void computeLineDistances();
+  external void computeBoundingBox();
+  external void computeBoundingSphere();
+  external void merge(
+      Geometry geometry, Matrix matrix, num materialIndexOffset);
+  external void mergeMesh(Mesh mesh);
+  external num mergeVertices();
+  external void sortFacesByMaterialIndex();
+
+  //external Func0<dynamic> get toJSON;
+  external set toJSON(Func0<dynamic> v);
+  external Geometry clone();
+  external Geometry copy(Geometry source);
+  external void dispose();
+
+  external List<Bone> get bones;
+  external set bones(List<Bone> v);
+  external AnimationClip get animation;
+  external set animation(AnimationClip v);
+  external List<AnimationClip> get animations;
+  external set animations(List<AnimationClip> v);
+  external void addEventListener(String type, VoidFunc1<dynamic> listener);
+  external void hasEventListener(String type, VoidFunc1<dynamic> listener);
+  external void removeEventListener(String type, VoidFunc1<dynamic> listener);
+/*         dispatchEvent(event # type: external Strin get g;
+		external set g(Strin v); target: external dynami get c;
+		external set c(dynami v); # ): external voi get d;
+		external set d(voi v); */
+
 }
 
-/*@anonymous*/
 @JS()
-class InstancedBufferAttribute {
-  external factory InstancedBufferAttribute /* extends BufferAttribute */ (
-      List<num> data, num itemSize, num meshPerAttribute);
+class InstancedBufferAttribute extends BufferAttribute {
+  external factory InstancedBufferAttribute(
+      [List<num> data, num itemSize, num meshPerAttribute]);
 
   external num get meshPerAttribute;
   external set meshPerAttribute(num v);
@@ -1093,22 +966,20 @@ class InstancedBufferAttribute {
   external InstancedBufferAttribute copy(InstancedBufferAttribute source);
 }
 
-/*@anonymous*/
 @JS()
-class InstancedBufferGeometry {
-  external factory InstancedBufferGeometry /* extends BufferGeometry */ ();
+class InstancedBufferGeometry extends BufferGeometry {
+  external factory InstancedBufferGeometry();
 
-  /*         groups #num start , num count , instances:num# []; */ external void addGroup(
-      num start, num count, num instances);
+  /*         groups #num start , num count , instances:num# []; */ external void
+      addGroup(num start, num count, num instances);
   external InstancedBufferGeometry clone();
   external InstancedBufferGeometry copy(InstancedBufferGeometry source);
 }
 
-/*@anonymous*/
 @JS()
-class InstancedInterleavedBuffer {
-  external factory InstancedInterleavedBuffer /* extends InterleavedBuffer */ (
-      List<num> array, num stride, num meshPerAttribute);
+class InstancedInterleavedBuffer extends InterleavedBuffer {
+  external factory InstancedInterleavedBuffer(
+      [List<num> array, num stride, num meshPerAttribute]);
 
   external num get meshPerAttribute;
   external set meshPerAttribute(num v);
@@ -1116,10 +987,9 @@ class InstancedInterleavedBuffer {
   external InstancedInterleavedBuffer copy(InstancedInterleavedBuffer source);
 }
 
-/*@anonymous*/
 @JS()
 class InterleavedBuffer {
-  external factory InterleavedBuffer(List<num> array, num stride);
+  external factory InterleavedBuffer([List<num> array, num stride]);
 
   external List<num> get array;
   external set array(List<num> v);
@@ -1137,16 +1007,16 @@ class InterleavedBuffer {
   external bool get needsUpdate;
   external set needsUpdate(bool v);
   external InterleavedBuffer setDynamic(bool dynamic);
-  external InterleavedBuffer clone();
   external InterleavedBuffer copy(InterleavedBuffer source);
-  external InterleavedBuffer copyAt(num index1, InterleavedBufferAttribute attribute, num index2);
+  external InterleavedBuffer copyAt(
+      num index1, InterleavedBufferAttribute attribute, num index2);
   external InterleavedBuffer set(List<num> value, num index);
 }
 
-/*@anonymous*/
 @JS()
 class InterleavedBufferAttribute {
-  external factory InterleavedBufferAttribute(InterleavedBuffer interleavedBuffer, num itemSize, num offset);
+  external factory InterleavedBufferAttribute(
+      [InterleavedBuffer interleavedBuffer, num itemSize, num offset]);
 
   external String get uuid;
   external set uuid(String v);
@@ -1171,10 +1041,10 @@ class InterleavedBufferAttribute {
   external InterleavedBufferAttribute setW(num index, num z);
   external InterleavedBufferAttribute setXY(num index, num x, num y);
   external InterleavedBufferAttribute setXYZ(num index, num x, num y, num z);
-  external InterleavedBufferAttribute setXYZW(num index, num x, num y, num z, num w);
+  external InterleavedBufferAttribute setXYZW(
+      num index, num x, num y, num z, num w);
 }
 
-/*@anonymous*/
 @JS()
 class Object3D {
   external factory Object3D();
@@ -1254,32 +1124,18 @@ class Object3D {
   external dynamic get userData;
   external set userData(dynamic v);
 
-  external Vector3 get DefaultUp;
-  external set DefaultUp(Vector3 v);
-  external Vector3 get DefaultMatrixAutoUpdate;
-  external set DefaultMatrixAutoUpdate(Vector3 v);
+  external static Vector3 get DefaultUp;
+  external static Vector3 get DefaultMatrixAutoUpdate;
   external void applyMatrix(Matrix4 matrix);
   external void setRotationFromAxisAngle(Vector3 axis, num angle);
   external void setRotationFromEuler(Euler euler);
   external void setRotationFromMatrix(Matrix4 m);
   external void setRotationFromQuaternion(Quaternion q);
-
-  /**
-   * Rotate an object along an axis in object space. The axis is assumed to be normalized.
-   * @param axis  A normalized vector in object space.
-   * @param angle  The angle in radians.
-   */
   external Object3D rotateOnAxis(Vector3 axis, num angle);
   external Object3D rotateX(num angle);
   external Object3D rotateY(num angle);
   external Object3D rotateZ(num angle);
   external Object3D translateOnAxis(Vector3 axis, num distance);
-
-  /**
-   *
-   * @param distance
-   * @param axis
-   */
   external Object3D translate(num distance, Vector3 axis);
   external Object3D translateX(num distance);
   external Object3D translateY(num distance);
@@ -1300,18 +1156,14 @@ class Object3D {
   external Vector3 getWorldScale(Vector3 optionalTarget);
   external Vector3 getWorldDirection(Vector3 optionalTarget);
   external void raycast(Raycaster raycaster, dynamic intersects);
+  external void traverse(VoidFunc1<Object3D> callback);
+  external void traverseVisible(VoidFunc1<Object3D> callback);
+  external void traverseAncestors(VoidFunc1<Object3D> callback);
   external void updateMatrix();
   external void updateMatrixWorld(bool force);
   external dynamic toJSON(dynamic meta);
   external Object3D clone(bool recursive);
-
-  /**
-   *
-   * @param object
-   * @param recursive
-   */
   external Object3D copy(Object3D source, bool recursive);
-
   external void addEventListener(String type, VoidFunc1<dynamic> listener);
   external void hasEventListener(String type, VoidFunc1<dynamic> listener);
   external void removeEventListener(String type, VoidFunc1<dynamic> listener);
@@ -1322,7 +1174,6 @@ class Object3D {
 
 }
 
-/*@anonymous*/
 @JS()
 class Intersection {
   external factory Intersection();
@@ -1343,7 +1194,6 @@ class Intersection {
   external set object(Object3D v);
 }
 
-/*@anonymous*/
 @JS()
 class RaycasterParameters {
   external factory RaycasterParameters();
@@ -1360,10 +1210,10 @@ class RaycasterParameters {
   external set Sprite(dynamic v);
 }
 
-/*@anonymous*/
 @JS()
 class Raycaster {
-  external factory Raycaster(Vector3 origin, Vector3 direction, num near, num far);
+  external factory Raycaster(
+      [Vector3 origin, Vector3 direction, num near, num far]);
 
   external Ray get ray;
   external set ray(Ray v);
@@ -1383,13 +1233,13 @@ class Raycaster {
 		external set m(nu v);# , Camera camera ): external voi get d;
 		external set d(voi v); */
   external List<Intersection> intersectObject(Object3D object, bool recursive);
-  external List<Intersection> intersectObjects(List<Object3D> objects, bool recursive);
+  external List<Intersection> intersectObjects(
+      List<Object3D> objects, bool recursive);
 }
 
-/*@anonymous*/
 @JS()
-class Light extends Object3D{
-  external factory Light /* extends Object3D */ (dynamic hex);
+class Light extends Object3D {
+  external factory Light([dynamic hex]);
 
   external Color get color;
   external set color(Color v);
@@ -1423,10 +1273,9 @@ class Light extends Object3D{
   external dynamic toJSON(dynamic meta);
 }
 
-/*@anonymous*/
 @JS()
 class LightShadow {
-  external factory LightShadow(Camera camera);
+  external factory LightShadow([Camera camera]);
 
   external Camera get camera;
   external set camera(Camera v);
@@ -1444,41 +1293,17 @@ class LightShadow {
   external LightShadow clone();
 }
 
-/**
- * This light's color gets applied to all the objects in the scene globally.
- *
- * # example
- *     var light = new THREE.AmbientLight( 0x404040 );
- *     scene.add( light );
- *
- * @source https:
- */
-
-/*@anonymous*/
 @JS()
-class AmbientLight {
-  external factory AmbientLight /* extends Light */ (dynamic hex);
+class AmbientLight extends Light {
+  external factory AmbientLight([dynamic hex]);
 
   external AmbientLight clone(bool recursive);
   external AmbientLight copy(AmbientLight source);
 }
 
-/**
- * Affects objects using MeshLambertMaterial or MeshPhongMaterial.
- *
- * @example
- *
- * var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
- * directionalLight.position.set( 0, 1, 0 );
- * scene.add( directionalLight );
- *
- * @see <a href="https:
- */
-
-/*@anonymous*/
 @JS()
-class DirectionalLight {
-  external factory DirectionalLight /* extends Light */ (dynamic hex, num intensity);
+class DirectionalLight extends Light {
+  external factory DirectionalLight([dynamic hex, num intensity]);
 
   external Object3D get target;
   external set target(Object3D v);
@@ -1492,10 +1317,10 @@ class DirectionalLight {
   external DirectionalLight copy(DirectionalLight source);
 }
 
-/*@anonymous*/
 @JS()
-class HemisphereLight {
-  external factory HemisphereLight /* extends Light */ (dynamic skyColorHex, dynamic groundColorHex, num intensity);
+class HemisphereLight extends Light {
+  external factory HemisphereLight(
+      [dynamic skyColorHex, dynamic groundColorHex, num intensity]);
 
   external Color get groundColor;
   external set groundColor(Color v);
@@ -1505,23 +1330,14 @@ class HemisphereLight {
   external HemisphereLight copy(HemisphereLight source);
 }
 
-/**
- * Affects objects using {@link MeshLambertMaterial} or {@link MeshPhongMaterial}.
- *
- * @example
- * var light = new THREE.PointLight( 0xff0000, 1, 100 );
- * light.position.set( 50, 50, 50 );
- * scene.add( light );
- */
-
-/*@anonymous*/
 @JS()
 class PointLight extends Light {
-  external factory PointLight   (dynamic hex, [num intensity, num distance, num decay]);
+  external factory PointLight(
+      [dynamic hex, num intensity, num distance, num decay]);
 
   /*
-         * Light's intensity.
-         * Default - 1.0.
+
+
          */
   external num get intensity;
   external set intensity(num v);
@@ -1538,11 +1354,15 @@ class PointLight extends Light {
   external PointLight copy(PointLight source);
 }
 
-/*@anonymous*/
 @JS()
-class SpotLight {
-  external factory SpotLight /* extends Light */ (
-      dynamic hex, num intensity, num distance, num angle, num exponent, num decay);
+class SpotLight extends Light {
+  external factory SpotLight(
+      [dynamic hex,
+      num intensity,
+      num distance,
+      num angle,
+      num exponent,
+      num decay]);
 
   external Object3D get target;
   external set target(Object3D v);
@@ -1554,8 +1374,8 @@ class SpotLight {
   external set distance(num v);
 
   /*
-         * Maximum extent of the spotlight, in radians, from its direction.
-         * Default — Math.PI/2.
+
+
          */
   external num get angle;
   external set angle(num v);
@@ -1572,7 +1392,6 @@ class SpotLight {
   external SpotLight copy(PointLight source);
 }
 
-/*@anonymous*/
 @JS()
 class Progress {
   external factory Progress();
@@ -1583,37 +1402,63 @@ class Progress {
   external set loaded(num v);
 }
 
-/**
- * Base class for implementing loaders.
- *
- * Events:
- *     load
- *         Dispatched when the image has completed loading
- *         content — loaded image
- *
- *     error
- *
- *          Dispatched when the image can't be loaded
- *          message — error message
- */
-
-/*@anonymous*/
 @JS()
 class Loader {
   external factory Loader();
 
-  external void onLoadStart();
-  external void onLoadProgress();
-  external void onLoadComplete();
+  external VoidFunc0 get onLoadStart;
+  external set onLoadStart(VoidFunc0 v);
+
+  external VoidFunc0 get onLoadProgress;
+  external set onLoadProgress(VoidFunc0 v);
+
+  external VoidFunc0 get onLoadComplete;
+  external set onLoadComplete(VoidFunc0 v);
 
   external String get crossOrigin;
   external set crossOrigin(String v);
   external String extractUrlBase(String url);
-  external List<Material> initMaterials(List<Material> materials, String texturePath);
-  external bool createMaterial(Material m, String texturePath, String crossOrigin);
+  external List<Material> initMaterials(
+      List<Material> materials, String texturePath);
+  external bool createMaterial(
+      Material m, String texturePath, String crossOrigin);
+
+  external static LoaderHandler get Handlers;
 }
 
-/*@anonymous*/
+@JS()
+class LoaderHandler {
+  external factory LoaderHandler();
+
+  external List<dynamic> get handlers;
+  external set handlers(List<dynamic> v);
+  external void add(String regex, Loader loader);
+  external Loader get(String file);
+}
+
+@JS()
+class BinaryTextureLoader {
+  external factory BinaryTextureLoader([LoadingManager manager]);
+
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external void load(String url, VoidFunc1<DataTexture> onLoad,
+      VoidFunc1<dynamic> onProgress, VoidFunc1<dynamic> onError);
+  external void setCrossOrigin(String crossOrigin);
+}
+
+@JS()
+class BufferGeometryLoader {
+  external factory BufferGeometryLoader([LoadingManager manager]);
+
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external void load(String url, VoidFunc1<BufferGeometry> onLoad,
+      VoidFunc1<dynamic> onProgress, VoidFunc1<dynamic> onError);
+  external void setCrossOrigin(String crossOrigin);
+  external BufferGeometry parse(dynamic json);
+}
+
 @JS()
 class Cache {
   external factory Cache();
@@ -1628,39 +1473,149 @@ class Cache {
   external void clear();
 }
 
-/*
-
-/*@anonymous*/
 @JS()
-class ObjectLoader {
-	external factory ObjectLoader (LoadingManager manager);
+class CompressedTextureLoader {
+  external factory CompressedTextureLoader([LoadingManager manager]);
 
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external void load(String url, VoidFunc1<CompressedTexture> onLoad,
+      VoidFunc1<dynamic> onProgress, VoidFunc1<dynamic> onError);
+  external void setCrossOrigin(String crossOrigin);
+}
 
+@JS()
+class CubeTextureLoader {
+  external factory CubeTextureLoader([LoadingManager manager]);
 
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external void load(List<String> urls, VoidFunc1<CubeTexture> onLoad,
+      VoidFunc1<dynamic> onProgress, VoidFunc1<dynamic> onError);
+  external void setCrossOrigin(String crossOrigin);
+}
 
+@JS()
+class ImageLoader {
+  external factory ImageLoader([LoadingManager manager]);
 
-		external LoadingManager get manager;
-		external set manager(LoadingManager v);
-         external String get texturePass;
-		external set texturePass(String v);external
+  external Cache get cache;
+  external set cache(Cache v);
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external String get crossOrigin;
+  external set crossOrigin(String v);
+  external ImageElement load(String url, VoidFunc1<ImageElement> onLoad,
+      VoidFunc1<dynamic> onProgress, VoidFunc1<dynamic> onError);
+  external void setCrossOrigin(String crossOrigin);
+}
 
-         void load(String url , onLoad(Object3D object ) : void);external
-         void setTexturePath( String value );external
-         void setCrossOrigin(String crossOrigin );
-         T external parse<T extends Object3D>(dynamic json , onLoad(Object3D object ) : void);external
-         List<dynamic> parseGeometries(dynamic json );external
-         List<Material> parseMaterials(dynamic json , List<Texture> textures );
-         List<external Func0<dynamic> external get > parseImages( dynamic json , onLoad : void );external
-         List<Texture> parseTextures( dynamic json , dynamic images );
-         T external parseObject<T extends Object3D>(dynamic data , List<dynamic> geometries , List<Material> materials );
+@JS()
+class JSONLoader extends Loader {
+  external factory JSONLoader([LoadingManager manager]);
 
-
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external bool get withCredentials;
+  external set withCredentials(bool v);
+  external void load(String url, VoidFunc2<Geometry, List<Material>> onLoad,
+      VoidFunc1<dynamic> onProgress, VoidFunc1<dynamic> onError);
+  external void setCrossOrigin(String crossOrigin);
+  external void setTexturePath(String value);
+/*         parse(dynamic json , String texturePath ) # geometry: external Geometr get y;
+		external set y(Geometr v); materials: List<Material> # ; */
 
 }
 
-   */
+@JS()
+class LoadingManager {
+  external factory LoadingManager(
+      [VoidFunc0 onLoad,
+      VoidFunc3<String, num, num> onProgress,
+      VoidFunc0 onError]);
 
-/*@anonymous*/
+  external VoidFunc0 get onStart;
+  external set onStart(VoidFunc0 v);
+
+  external VoidFunc0 get onLoad;
+  external set onLoad(VoidFunc0 v);
+  external void onProgress(dynamic item, num loaded, num total);
+
+  external VoidFunc0 get onError;
+  external set onError(VoidFunc0 v);
+  external void itemStart(String url);
+  external void itemEnd(String url);
+  external void itemError(String url);
+}
+
+external int get DefaultLoadingManager;
+
+@JS()
+class MaterialLoader {
+  external factory MaterialLoader([LoadingManager manager]);
+
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+/*         textures # [key:String]:Texture # ; */ external void load(
+      String url, VoidFunc1<Material> onLoad);
+  external void setCrossOrigin(String crossOrigin);
+/*         setTextures(textures # [key:String]:Texture # ): external voi get d;
+		external set d(voi v); */
+  external Texture getTexture(String name);
+  external Material parse(dynamic json);
+}
+
+@JS()
+class ObjectLoader {
+  external factory ObjectLoader([LoadingManager manager]);
+
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external String get texturePass;
+  external set texturePass(String v);
+  external void load(String url, VoidFunc1<Object3D> onLoad);
+  external void setTexturePath(String value);
+  external void setCrossOrigin(String crossOrigin);
+  external dynamic parse(dynamic json, VoidFunc1<Object3D> onLoad);
+  external List<dynamic> parseGeometries(dynamic json);
+  external List<Material> parseMaterials(dynamic json, List<Texture> textures);
+  external List<dynamic> parseImages(dynamic json, VoidFunc0 onLoad);
+  external List<Texture> parseTextures(dynamic json, dynamic images);
+  external dynamic parseObject(
+      dynamic data, List<dynamic> geometries, List<Material> materials);
+}
+
+@JS()
+class TextureLoader {
+  external factory TextureLoader([LoadingManager manager]);
+
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external String get crossOrigin;
+  external set crossOrigin(String v);
+  external Texture load(String url, VoidFunc1<Texture> onLoad);
+  external void setCrossOrigin(String crossOrigin);
+}
+
+@JS()
+class XHRLoader {
+  external factory XHRLoader([LoadingManager manager]);
+
+  external Cache get cache;
+  external set cache(Cache v);
+  external LoadingManager get manager;
+  external set manager(LoadingManager v);
+  external String get responseType;
+  external set responseType(String v);
+  external String get crossOrigin;
+  external set crossOrigin(String v);
+  external dynamic load(String url, VoidFunc1<String> onLoad,
+      VoidFunc1<dynamic> onProgress, VoidFunc1<dynamic> onError);
+  external void setResponseType(String responseType);
+  external void setCrossOrigin(String crossOrigin);
+  external void setWithCredentials(String withCredentials);
+}
+
 @JS()
 class MaterialParameters {
   external factory MaterialParameters();
@@ -1701,7 +1656,6 @@ class MaterialParameters {
   external set needsUpdate(bool v);
 }
 
-/*@anonymous*/
 @JS()
 class Material {
   external factory Material();
@@ -1773,9 +1727,6 @@ class Material {
   external num get alphaTest;
   external set alphaTest(num v);
 
-  /**
-   * Enables/disables overdraw. If greater than zero, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the CanvasRenderer. Default is 0.
-   */
   external num get overdraw;
   external set overdraw(num v);
 
@@ -1786,7 +1737,7 @@ class Material {
   external set needsUpdate(bool v);
   external void setValues(Object values);
   external dynamic toJSON(dynamic meta);
-  external Material clone();
+  external Material clone(Material source);
   external void update();
   external void dispose();
   external void addEventListener(String type, VoidFunc1<dynamic> listener);
@@ -1799,10 +1750,9 @@ class Material {
 
 }
 
-/*@anonymous*/
 @JS()
-class LineBasicMaterialParameters {
-  external factory LineBasicMaterialParameters() /* extends MaterialParameters */;
+class LineBasicMaterialParameters extends MaterialParameters {
+  external factory LineBasicMaterialParameters();
 
   external dynamic get color;
   external set color(dynamic v);
@@ -1818,10 +1768,9 @@ class LineBasicMaterialParameters {
   external set fog(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class LineBasicMaterial {
-  external factory LineBasicMaterial /* extends Material */ (LineBasicMaterialParameters parameters);
+class LineBasicMaterial extends Material {
+  external factory LineBasicMaterial([LineBasicMaterialParameters parameters]);
 
   external Color get color;
   external set color(Color v);
@@ -1839,10 +1788,9 @@ class LineBasicMaterial {
   external LineBasicMaterial copy(LineBasicMaterial source);
 }
 
-/*@anonymous*/
 @JS()
-class LineDashedMaterialParameters {
-  external factory LineDashedMaterialParameters() /* extends MaterialParameters */;
+class LineDashedMaterialParameters extends MaterialParameters {
+  external factory LineDashedMaterialParameters();
 
   external dynamic get color;
   external set color(dynamic v);
@@ -1860,10 +1808,10 @@ class LineDashedMaterialParameters {
   external set fog(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class LineDashedMaterial {
-  external factory LineDashedMaterial /* extends Material */ (LineDashedMaterialParameters parameters);
+class LineDashedMaterial extends Material {
+  external factory LineDashedMaterial(
+      [LineDashedMaterialParameters parameters]);
 
   external Color get color;
   external set color(Color v);
@@ -1883,10 +1831,9 @@ class LineDashedMaterial {
   external LineDashedMaterial copy(LineDashedMaterial source);
 }
 
-/*@anonymous*/
 @JS()
-class MeshBasicMaterialParameters {
-  external factory MeshBasicMaterialParameters() /* extends MaterialParameters */;
+class MeshBasicMaterialParameters extends MaterialParameters {
+  external factory MeshBasicMaterialParameters();
 
   external dynamic get color;
   external set color(dynamic v);
@@ -1932,10 +1879,9 @@ class MeshBasicMaterialParameters {
   external set fog(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class MeshBasicMaterial {
-  external factory MeshBasicMaterial /* extends Material */ (MeshBasicMaterialParameters parameters);
+class MeshBasicMaterial extends Material {
+  external factory MeshBasicMaterial([MeshBasicMaterialParameters parameters]);
 
   external Color get color;
   external set color(Color v);
@@ -1979,10 +1925,9 @@ class MeshBasicMaterial {
   external MeshBasicMaterial copy(MeshBasicMaterial source);
 }
 
-/*@anonymous*/
 @JS()
-class MeshDepthMaterialParameters {
-  external factory MeshDepthMaterialParameters() /* extends MaterialParameters */;
+class MeshDepthMaterialParameters extends MaterialParameters {
+  external factory MeshDepthMaterialParameters();
 
   external bool get wireframe;
   external set wireframe(bool v);
@@ -1990,10 +1935,9 @@ class MeshDepthMaterialParameters {
   external set wireframeLinewidth(num v);
 }
 
-/*@anonymous*/
 @JS()
-class MeshDepthMaterial {
-  external factory MeshDepthMaterial /* extends Material */ (MeshDepthMaterialParameters parameters);
+class MeshDepthMaterial extends Material {
+  external factory MeshDepthMaterial([MeshDepthMaterialParameters parameters]);
 
   external bool get wireframe;
   external set wireframe(bool v);
@@ -2005,8 +1949,8 @@ class MeshDepthMaterial {
 
 @anonymous
 @JS()
-class MeshLambertMaterialParameters extends MaterialParameters{
-  external factory MeshLambertMaterialParameters({dynamic color});
+class MeshLambertMaterialParameters extends MaterialParameters {
+  external factory MeshLambertMaterialParameters();
 
   external dynamic get color;
   external set color(dynamic v);
@@ -2044,10 +1988,10 @@ class MeshLambertMaterialParameters extends MaterialParameters{
   external set morphNormals(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class MeshLambertMaterial extends Material{
-  external factory MeshLambertMaterial /* extends Material */ (MeshLambertMaterialParameters parameters);
+class MeshLambertMaterial extends Material {
+  external factory MeshLambertMaterial(
+      [MeshLambertMaterialParameters parameters]);
 
   external Color get color;
   external set color(Color v);
@@ -2089,10 +2033,9 @@ class MeshLambertMaterial extends Material{
   external MeshLambertMaterial copy(MeshLambertMaterial source);
 }
 
-/*@anonymous*/
 @JS()
-class MeshNormalMaterialParameters {
-  external factory MeshNormalMaterialParameters() /* extends MaterialParameters */;
+class MeshNormalMaterialParameters extends MaterialParameters {
+  external factory MeshNormalMaterialParameters();
 
   external num get opacity;
   external set opacity(num v);
@@ -2113,10 +2056,10 @@ class MeshNormalMaterialParameters {
   external set wireframeLinewidth(num v);
 }
 
-/*@anonymous*/
 @JS()
-class MeshNormalMaterial {
-  external factory MeshNormalMaterial /* extends Material */ (MeshNormalMaterialParameters parameters);
+class MeshNormalMaterial extends Material {
+  external factory MeshNormalMaterial(
+      [MeshNormalMaterialParameters parameters]);
 
   external bool get wireframe;
   external set wireframe(bool v);
@@ -2128,10 +2071,9 @@ class MeshNormalMaterial {
   external MeshNormalMaterial copy(MeshNormalMaterial source);
 }
 
-/*@anonymous*/
 @JS()
-class MeshPhongMaterialParameters {
-  external factory MeshPhongMaterialParameters() /* extends MaterialParameters */;
+class MeshPhongMaterialParameters extends MaterialParameters {
+  external factory MeshPhongMaterialParameters();
 
   /** geometry color in hexadecimal. Default is 0xffffff. */
   external dynamic get color;
@@ -2206,10 +2148,9 @@ class MeshPhongMaterialParameters {
   external set fog(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class MeshPhongMaterial {
-  external factory MeshPhongMaterial /* extends Material */ (MeshPhongMaterialParameters parameters);
+class MeshPhongMaterial extends Material {
+  external factory MeshPhongMaterial([MeshPhongMaterialParameters parameters]);
 
   external Color get color;
   external set color(Color v);
@@ -2283,29 +2224,26 @@ class MeshPhongMaterial {
   external MeshPhongMaterial copy(MeshPhongMaterial source);
 }
 
-/*@anonymous*/
 @JS()
-class MultiMaterial {
-  external factory MultiMaterial /* extends Material */ (List<Material> materials);
+class MultiMaterial extends Material {
+  external factory MultiMaterial([List<Material> materials]);
 
   external List<Material> get materials;
   external set materials(List<Material> v);
 
-  external Func0<dynamic> get toJSON;
+  //external Func0<dynamic> get toJSON;
   external set toJSON(Func0<dynamic> v);
   external MultiMaterial clone();
 }
 
-/*@anonymous*/
 @JS()
-class MeshFaceMaterial {
-  external factory MeshFaceMaterial() /* extends MultiMaterial */;
+class MeshFaceMaterial extends MultiMaterial {
+  external factory MeshFaceMaterial();
 }
 
-/*@anonymous*/
 @JS()
-class PointsMaterialParameters {
-  external factory PointsMaterialParameters() /* extends MaterialParameters */;
+class PointsMaterialParameters extends MaterialParameters {
+  external factory PointsMaterialParameters();
 
   external dynamic get color;
   external set color(dynamic v);
@@ -2317,6 +2255,8 @@ class PointsMaterialParameters {
   external set size(num v);
   external bool get sizeAttenuation;
   external set sizeAttenuation(bool v);
+  external Blending get blending;
+  external set blending(Blending v);
   external bool get depthTest;
   external set depthTest(bool v);
   external bool get depthWrite;
@@ -2327,10 +2267,9 @@ class PointsMaterialParameters {
   external set fog(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class PointsMaterial {
-  external factory PointsMaterial /* extends Material */ (PointsMaterialParameters parameters);
+class PointsMaterial extends Material {
+  external factory PointsMaterial([PointsMaterialParameters parameters]);
 
   external Color get color;
   external set color(Color v);
@@ -2348,16 +2287,14 @@ class PointsMaterial {
   external PointsMaterial copy(PointsMaterial source);
 }
 
-/*@anonymous*/
 @JS()
-class RawShaderMaterial {
-  external factory RawShaderMaterial /* extends ShaderMaterial */ (ShaderMaterialParameters parameters);
+class RawShaderMaterial extends ShaderMaterial {
+  external factory RawShaderMaterial([ShaderMaterialParameters parameters]);
 }
 
-/*@anonymous*/
 @JS()
-class ShaderMaterialParameters {
-  external factory ShaderMaterialParameters() /* extends MaterialParameters */;
+class ShaderMaterialParameters extends MaterialParameters {
+  external factory ShaderMaterialParameters();
 
   external dynamic get defines;
   external set defines(dynamic v);
@@ -2393,10 +2330,9 @@ class ShaderMaterialParameters {
   external set fog(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class ShaderMaterial {
-  external factory ShaderMaterial /* extends Material */ (ShaderMaterialParameters parameters);
+class ShaderMaterial extends Material {
+  external factory ShaderMaterial([ShaderMaterialParameters parameters]);
 
   external dynamic get defines;
   external set defines(dynamic v);
@@ -2437,10 +2373,9 @@ class ShaderMaterial {
   external dynamic toJSON(dynamic meta);
 }
 
-/*@anonymous*/
 @JS()
-class SpriteMaterialParameters {
-  external factory SpriteMaterialParameters() /* extends MaterialParameters */;
+class SpriteMaterialParameters extends MaterialParameters {
+  external factory SpriteMaterialParameters();
 
   external dynamic get color;
   external set color(dynamic v);
@@ -2462,10 +2397,9 @@ class SpriteMaterialParameters {
   external set fog(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class SpriteMaterial {
-  external factory SpriteMaterial /* extends Material */ (SpriteMaterialParameters parameters);
+class SpriteMaterial extends Material {
+  external factory SpriteMaterial([SpriteMaterialParameters parameters]);
 
   external Color get color;
   external set color(Color v);
@@ -2479,10 +2413,9 @@ class SpriteMaterial {
   external SpriteMaterial copy(SpriteMaterial source);
 }
 
-/*@anonymous*/
 @JS()
 class Box2 {
-  external factory Box2(Vector2 min, Vector2 max);
+  external factory Box2([Vector2 min, Vector2 max]);
 
   external Vector2 get max;
   external set max(Vector2 v);
@@ -2512,10 +2445,9 @@ class Box2 {
   external bool equals(Box2 box);
 }
 
-/*@anonymous*/
 @JS()
 class Box3 {
-  external factory Box3(Vector3 min, Vector3 max);
+  external factory Box3([Vector3 min, Vector3 max]);
 
   external Vector3 get max;
   external set max(Vector3 v);
@@ -2548,7 +2480,6 @@ class Box3 {
   external bool equals(Box3 box);
 }
 
-/*@anonymous*/
 @JS()
 class HSL {
   external factory HSL();
@@ -2561,19 +2492,9 @@ class HSL {
   external set l(num v);
 }
 
-/**
- * Represents a color. See also {@link ColorUtils}.
- *
- * @example
- * var color = new THREE.Color( 0xff0000 );
- *
- * @see <a href="https:
- */
-
-/*@anonymous*/
 @JS()
 class Color {
-  external factory Color(num r, num g, num b);
+  external factory Color([num r, num g, num b]);
 
   external num get r;
   external set r(num v);
@@ -2583,25 +2504,9 @@ class Color {
 
   external num get b;
   external set b(num v);
-  external Color set(Color color);
+  external Color set(num color);
   external Color setHex(num hex);
-
-  /**
-   * Sets this color from RGB values.
-   * @param r Red channel value between 0 and 1.
-   * @param g Green channel value between 0 and 1.
-   * @param b Blue channel value between 0 and 1.
-   */
   external Color setRGB(num r, num g, num b);
-
-  /**
-   * Sets this color from HSL values.
-   * Based on MochiKit implementation by Bob Ippolito.
-   *
-   * @param h Hue channel value between 0 and 1.
-   * @param s Saturation value channel between 0 and 1.
-   * @param l Value channel value between 0 and 1.
-   */
   external Color setHSL(num h, num s, num l);
   external Color setStyle(String style);
   external Color clone();
@@ -2626,310 +2531,162 @@ class Color {
   external List<num> toArray(List<num> array, num offset);
 }
 
-/*@anonymous*/
 @JS()
 class ColorKeywords {
   external factory ColorKeywords();
 
   external static num get aliceblue;
-
   external static num get antiquewhite;
-
   external static num get aqua;
-
   external static num get aquamarine;
-
   external static num get azure;
-
   external static num get beige;
-
   external static num get bisque;
-
   external static num get black;
-
   external static num get blanchedalmond;
-
   external static num get blue;
-
   external static num get blueviolet;
-
   external static num get brown;
-
   external static num get burlywood;
-
   external static num get cadetblue;
-
   external static num get chartreuse;
-
   external static num get chocolate;
-
   external static num get coral;
-
   external static num get cornflowerblue;
-
   external static num get cornsilk;
-
   external static num get crimson;
-
   external static num get cyan;
-
   external static num get darkblue;
-
   external static num get darkcyan;
-
   external static num get darkgoldenrod;
-
   external static num get darkgray;
-
   external static num get darkgreen;
-
   external static num get darkgrey;
-
   external static num get darkkhaki;
-
   external static num get darkmagenta;
-
   external static num get darkolivegreen;
-
   external static num get darkorange;
-
   external static num get darkorchid;
-
   external static num get darkred;
-
   external static num get darksalmon;
-
   external static num get darkseagreen;
-
   external static num get darkslateblue;
-
   external static num get darkslategray;
-
   external static num get darkslategrey;
-
   external static num get darkturquoise;
-
   external static num get darkviolet;
-
   external static num get deeppink;
-
   external static num get deepskyblue;
-
   external static num get dimgray;
-
   external static num get dimgrey;
-
   external static num get dodgerblue;
-
   external static num get firebrick;
-
   external static num get floralwhite;
-
   external static num get forestgreen;
-
   external static num get fuchsia;
-
   external static num get gainsboro;
-
   external static num get ghostwhite;
-
   external static num get gold;
-
   external static num get goldenrod;
-
   external static num get gray;
-
   external static num get green;
-
   external static num get greenyellow;
-
   external static num get grey;
-
   external static num get honeydew;
-
   external static num get hotpink;
-
   external static num get indianred;
-
   external static num get indigo;
-
   external static num get ivory;
-
   external static num get khaki;
-
   external static num get lavender;
-
   external static num get lavenderblush;
-
   external static num get lawngreen;
-
   external static num get lemonchiffon;
-
   external static num get lightblue;
-
   external static num get lightcoral;
-
   external static num get lightcyan;
-
   external static num get lightgoldenrodyellow;
-
   external static num get lightgray;
-
   external static num get lightgreen;
-
   external static num get lightgrey;
-
   external static num get lightpink;
-
   external static num get lightsalmon;
-
   external static num get lightseagreen;
-
   external static num get lightskyblue;
-
   external static num get lightslategray;
-
   external static num get lightslategrey;
-
   external static num get lightsteelblue;
-
   external static num get lightyellow;
-
   external static num get lime;
-
   external static num get limegreen;
-
   external static num get linen;
-
   external static num get magenta;
-
   external static num get maroon;
-
   external static num get mediumaquamarine;
-
   external static num get mediumblue;
-
   external static num get mediumorchid;
-
   external static num get mediumpurple;
-
   external static num get mediumseagreen;
-
   external static num get mediumslateblue;
-
   external static num get mediumspringgreen;
-
   external static num get mediumturquoise;
-
   external static num get mediumvioletred;
-
   external static num get midnightblue;
-
   external static num get mintcream;
-
   external static num get mistyrose;
-
   external static num get moccasin;
-
   external static num get navajowhite;
-
   external static num get navy;
-
   external static num get oldlace;
-
   external static num get olive;
-
   external static num get olivedrab;
-
   external static num get orange;
-
   external static num get orangered;
-
   external static num get orchid;
-
   external static num get palegoldenrod;
-
   external static num get palegreen;
-
   external static num get paleturquoise;
-
   external static num get palevioletred;
-
   external static num get papayawhip;
-
   external static num get peachpuff;
-
   external static num get peru;
-
   external static num get pink;
-
   external static num get plum;
-
   external static num get powderblue;
-
   external static num get purple;
-
   external static num get red;
-
   external static num get rosybrown;
-
   external static num get royalblue;
-
   external static num get saddlebrown;
-
   external static num get salmon;
-
   external static num get sandybrown;
-
   external static num get seagreen;
-
   external static num get seashell;
-
   external static num get sienna;
-
   external static num get silver;
-
   external static num get skyblue;
-
   external static num get slateblue;
-
   external static num get slategray;
-
   external static num get slategrey;
-
   external static num get snow;
-
   external static num get springgreen;
-
   external static num get steelblue;
-
   external static num get tan;
-
   external static num get teal;
-
   external static num get thistle;
-
   external static num get tomato;
-
   external static num get turquoise;
-
   external static num get violet;
-
   external static num get wheat;
-
   external static num get white;
-
   external static num get whitesmoke;
-
   external static num get yellow;
-
   external static num get yellowgreen;
 }
 
-/*@anonymous*/
 @JS()
 class Euler {
-  external factory Euler(num x, num y, num z, String order);
+  external factory Euler([num x, num y, num z, String order]);
 
   external static String get DefaultOrder;
 
@@ -2952,13 +2709,14 @@ class Euler {
   external Euler fromArray(List<dynamic> xyzo);
   external List<num> toArray(List<num> array, num offset);
   external Vector3 toVector3(Vector3 optionalResult);
-  external void onChange();
+  external VoidFunc0 get onChange;
+  external set onChange(VoidFunc0 v);
 }
 
-/*@anonymous*/
 @JS()
 class Frustum {
-  external factory Frustum(Plane p0, Plane p1, Plane p2, Plane p3, Plane p4, Plane p5);
+  external factory Frustum(
+      [Plane p0, Plane p1, Plane p2, Plane p3, Plane p4, Plane p5]);
 
   external List<Plane> get planes;
   external set planes(List<Plane> v);
@@ -2972,10 +2730,9 @@ class Frustum {
   external bool containsPoint(Vector3 point);
 }
 
-/*@anonymous*/
 @JS()
 class Line3 {
-  external factory Line3(Vector3 start, Vector3 end);
+  external factory Line3([Vector3 start, Vector3 end]);
 
   external Vector3 get start;
   external set start(Vector3 v);
@@ -2990,47 +2747,25 @@ class Line3 {
   external num distance();
   external Vector3 at(num t, Vector3 optionalTarget);
   external num closestPointToPointParameter(Vector3 point, bool clampToLine);
-  external Vector3 closestPointToPoint(Vector3 point, bool clampToLine, Vector3 optionalTarget);
+  external Vector3 closestPointToPoint(
+      Vector3 point, bool clampToLine, Vector3 optionalTarget);
   external Line3 applyMatrix4(Matrix4 matrix);
   external bool equals(Line3 line);
 }
 
-/*@anonymous*/
 @JS()
 class Math {
   external factory Math();
 
   external String generateUUID();
-
-  /**
-   * Clamps the x to be between a and b.
-   *
-   * @param value Value to be clamped.
-   * @param min Minimum value
-   * @param max Maximum value.
-   */
   external num clamp(num value, num min, num max);
   external num euclideanModulo(num n, num m);
-
-  /**
-   * Linear mapping of x from range [a1, a2] to range [b1, b2].
-   *
-   * @param x Value to be mapped.
-   * @param a1 Minimum value for range A.
-   * @param a2 Maximum value for range A.
-   * @param b1 Minimum value for range B.
-   * @param b2 Maximum value for range B.
-   */
   external num mapLinear(num x, num a1, num a2, num b1, num b2);
   external num smoothstep(num x, num min, num max);
   external num smootherstep(num x, num min, num max);
   external num random16();
   external num randInt(num low, num high);
   external num randFloat(num low, num high);
-
-  /**
-   * Random float from - range / 2 to range / 2 interval.
-   */
   external num randFloatSpread(num range);
   external num degToRad(num degrees);
   external num radToDeg(num radians);
@@ -3039,7 +2774,6 @@ class Math {
   external num nextPowerOfTwo(num value);
 }
 
-/*@anonymous*/
 @JS()
 class Matrix {
   external factory Matrix();
@@ -3055,19 +2789,30 @@ class Matrix {
   external Matrix clone();
 }
 
-/*@anonymous*/
 @JS()
 class Matrix3 {
-  external factory Matrix3(num n11, num n12, num n13, num n21, num n22, num n23, num n31, num n32, num n33);
+  external factory Matrix3(
+      [num n11,
+      num n12,
+      num n13,
+      num n21,
+      num n22,
+      num n23,
+      num n31,
+      num n32,
+      num n33]);
 
   external List get elements;
   external set elements(List v);
-  external Matrix3 set(num n11, num n12, num n13, num n21, num n22, num n23, num n31, num n32, num n33);
+  external Matrix3 set(num n11, num n12, num n13, num n21, num n22, num n23,
+      num n31, num n32, num n33);
   external Matrix3 identity();
   external Matrix3 clone();
   external Matrix3 copy(Matrix3 m);
-  external List<num> applyToVector3Array(List<num> array, num offset, num length);
-  external BufferAttribute applyToBuffer(BufferAttribute buffer, num offset, num length);
+  external List<num> applyToVector3Array(
+      List<num> array, num offset, num length);
+  external BufferAttribute applyToBuffer(
+      BufferAttribute buffer, num offset, num length);
   external Matrix3 multiplyScalar(num s);
   external num determinant();
   external Matrix3 getInverse(Matrix3 matrix, bool throwOnInvertible);
@@ -3079,35 +2824,45 @@ class Matrix3 {
   external List<num> toArray();
 }
 
-/**
- * A 4x4 Matrix.
- *
- * @example
- *
- * var m = new THREE.Matrix4();
- * var m1 = new THREE.Matrix4();
- * var m2 = new THREE.Matrix4();
- * var m3 = new THREE.Matrix4();
- * var alpha = 0;
- * var beta = Math.PI;
- * var gamma = Math.PI/2;
- * m1.makeRotationX( alpha );
- * m2.makeRotationY( beta );
- * m3.makeRotationZ( gamma );
- * m.multiplyMatrices( m1, m2 );
- * m.multiply( m3 );
- */
-
-/*@anonymous*/
 @JS()
 class Matrix4 {
-  external factory Matrix4(num n11, num n12, num n13, num n14, num n21, num n22, num n23, num n24, num n31, num n32,
-                           num n33, num n34, num n41, num n42, num n43, num n44);
+  external factory Matrix4(
+      [num n11,
+      num n12,
+      num n13,
+      num n14,
+      num n21,
+      num n22,
+      num n23,
+      num n24,
+      num n31,
+      num n32,
+      num n33,
+      num n34,
+      num n41,
+      num n42,
+      num n43,
+      num n44]);
 
   external List get elements;
   external set elements(List v);
-  external Matrix4 set(num n11, num n12, num n13, num n14, num n21, num n22, num n23, num n24, num n31, num n32,
-                       num n33, num n34, num n41, num n42, num n43, num n44);
+  external Matrix4 set(
+      num n11,
+      num n12,
+      num n13,
+      num n14,
+      num n21,
+      num n22,
+      num n23,
+      num n24,
+      num n31,
+      num n32,
+      num n33,
+      num n34,
+      num n41,
+      num n42,
+      num n43,
+      num n44);
   external Matrix4 identity();
   external Matrix4 clone();
   external Matrix4 copy(Matrix4 m);
@@ -3122,8 +2877,10 @@ class Matrix4 {
   external Matrix4 multiplyMatrices(Matrix4 a, Matrix4 b);
   external Matrix4 multiplyToArray(Matrix4 a, Matrix4 b, List<num> r);
   external Matrix4 multiplyScalar(num s);
-  external List<num> applyToVector3Array(List<num> array, num offset, num length);
-  external BufferAttribute applyToBuffer(BufferAttribute buffer, num offset, num length);
+  external List<num> applyToVector3Array(
+      List<num> array, num offset, num length);
+  external BufferAttribute applyToBuffer(
+      BufferAttribute buffer, num offset, num length);
   external num determinant();
   external Matrix4 transpose();
   external List<num> flattenToArrayOffset(List<num> array, num offset);
@@ -3132,51 +2889,28 @@ class Matrix4 {
   external Matrix4 scale(Vector3 v);
   external num getMaxScaleOnAxis();
   external Matrix4 makeTranslation(num x, num y, num z);
-
-  /**
-   * Sets this matrix as rotation transform around x axis by theta radians.
-   *
-   * @param theta Rotation angle in radians.
-   */
   external Matrix4 makeRotationX(num theta);
-
-  /**
-   * Sets this matrix as rotation transform around y axis by theta radians.
-   *
-   * @param theta Rotation angle in radians.
-   */
   external Matrix4 makeRotationY(num theta);
-
-  /**
-   * Sets this matrix as rotation transform around z axis by theta radians.
-   *
-   * @param theta Rotation angle in radians.
-   */
   external Matrix4 makeRotationZ(num theta);
-
-  /**
-   * Sets this matrix as rotation transform around axis by angle radians.
-   * Based on http:
-   *
-   * @param axis Rotation axis.
-   * @param theta Rotation angle in radians.
-   */
   external Matrix4 makeRotationAxis(Vector3 axis, num angle);
   external Matrix4 makeScale(num x, num y, num z);
-  external Matrix4 compose(Vector3 translation, Quaternion rotation, Vector3 scale);
-  external List<Object> decompose(Vector3 translation, Quaternion rotation, Vector3 scale);
-  external Matrix4 makeFrustum(num left, num right, num bottom, num top, num near, num far);
+  external Matrix4 compose(
+      Vector3 translation, Quaternion rotation, Vector3 scale);
+  external List<Object> decompose(
+      Vector3 translation, Quaternion rotation, Vector3 scale);
+  external Matrix4 makeFrustum(
+      num left, num right, num bottom, num top, num near, num far);
   external Matrix4 makePerspective(num fov, num aspect, num near, num far);
-  external Matrix4 makeOrthographic(num left, num right, num top, num bottom, num near, num far);
+  external Matrix4 makeOrthographic(
+      num left, num right, num top, num bottom, num near, num far);
   external bool equals(Matrix4 matrix);
   external Matrix4 fromArray(List<num> array);
   external List<num> toArray();
 }
 
-/*@anonymous*/
 @JS()
 class Plane {
-  external factory Plane(Vector3 normal, num constant);
+  external factory Plane([Vector3 normal, num constant]);
 
   external Vector3 get normal;
   external set normal(Vector3 v);
@@ -3202,27 +2936,9 @@ class Plane {
   external bool equals(Plane plane);
 }
 
-/**
- * Implementation of a quaternion. This is used for rotating things without incurring in the dreaded gimbal lock issue, amongst other advantages.
- *
- * @example
- * var quaternion = new THREE.Quaternion();
- * quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
- * var vector = new THREE.Vector3( 1, 0, 0 );
- * vector.applyQuaternion( quaternion );
- */
-
-/*@anonymous*/
 @JS()
 class Quaternion {
-  external factory Quaternion(num x, num y, num z, num w);
-
-  /**
-   * @param x x coordinate
-   * @param y y coordinate
-   * @param z z coordinate
-   * @param w w coordinate
-   */
+  external factory Quaternion([num x, num y, num z, num w]);
 
   external num get x;
   external set x(num v);
@@ -3236,12 +2952,6 @@ class Quaternion {
   external Quaternion clone();
   external Quaternion copy(Quaternion q);
   external Quaternion setFromEuler(Euler euler, bool update);
-
-  /**
-   * Sets this quaternion from rotation specified by axis and angle.
-   * Adapted from http:
-   * Axis have to be normalized, angle is in radians.
-   */
   external Quaternion setFromAxisAngle(Vector3 axis, num angle);
   external Quaternion setFromRotationMatrix(Matrix4 m);
   external Quaternion setFromUnitVectors(Vector3 vFrom, Vector3 vTo);
@@ -3256,18 +2966,16 @@ class Quaternion {
   external Vector3 multiplyVector3(Vector3 vector);
   external Quaternion slerp(Quaternion qb, num t);
   external bool equals(Quaternion v);
-  external Quaternion fromArray(List<num> xyzw, num offset);
-  external List<num> toArray(List<num> xyzw, num offset);
-  external void onChange();
+  external Quaternion fromArray(List<num> n);
+  external List<num> toArray();
 
-// external static Quaternion slerp(Quaternion qa , Quaternion qb , Quaternion qm , num t );
-
+  external VoidFunc0 get onChange;
+  external set onChange(VoidFunc0 v);
 }
 
-/*@anonymous*/
 @JS()
 class Ray {
-  external factory Ray(Vector3 origin, Vector3 direction);
+  external factory Ray([Vector3 origin, Vector3 direction]);
 
   external Vector3 get origin;
   external set origin(Vector3 v);
@@ -3281,7 +2989,8 @@ class Ray {
   external Vector3 closestPointToPoint(Vector3 point, Vector3 optionalTarget);
   external num distanceToPoint(Vector3 point);
   external num distanceSqToPoint(Vector3 point);
-  external num distanceSqToSegment(Vector3 v0, Vector3 v1, Vector3 optionalPointOnRay, Vector3 optionalPointOnSegment);
+  external num distanceSqToSegment(Vector3 v0, Vector3 v1,
+      Vector3 optionalPointOnRay, Vector3 optionalPointOnSegment);
   external bool isIntersectionSphere(Sphere sphere);
   external Vector3 intersectSphere(Sphere sphere, Vector3 optionalTarget);
   external bool isIntersectionPlane(Plane plane);
@@ -3289,15 +2998,15 @@ class Ray {
   external Vector3 intersectPlane(Plane plane, Vector3 optionalTarget);
   external bool isIntersectionBox(Box3 box);
   external Vector3 intersectBox(Box3 box, Vector3 optionalTarget);
-  external Vector3 intersectTriangle(Vector3 a, Vector3 b, Vector3 c, bool backfaceCulling, Vector3 optionalTarget);
+  external Vector3 intersectTriangle(Vector3 a, Vector3 b, Vector3 c,
+      bool backfaceCulling, Vector3 optionalTarget);
   external Ray applyMatrix4(Matrix4 matrix4);
   external bool equals(Ray ray);
 }
 
-/*@anonymous*/
 @JS()
 class Sphere {
-  external factory Sphere(Vector3 center, num radius);
+  external factory Sphere([Vector3 center, num radius]);
 
   external Vector3 get center;
   external set center(Vector3 v);
@@ -3318,7 +3027,6 @@ class Sphere {
   external bool equals(Sphere sphere);
 }
 
-/*@anonymous*/
 @JS()
 class SplineControlPoint {
   external factory SplineControlPoint();
@@ -3331,61 +3039,45 @@ class SplineControlPoint {
   external set z(num v);
 }
 
-/**
- * Represents a spline.
- *
- * @see <a href="https:
- */
-
-/*@anonymous*/
 @JS()
 class Spline {
-  external factory Spline(List<SplineControlPoint> points);
+  external factory Spline([List<SplineControlPoint> points]);
 
   external List<SplineControlPoint> get points;
   external set points(List<SplineControlPoint> v);
-
-  /**
-   * Initialises using the data in the array as a series of points. Each value in a must be another array with three values, where a[n] is v, the value for the nth point, and v[0], v[1] and v[2] are the x, y and z coordinates of that point n, respectively.
-   *
-   * @param a array of triplets containing x, y, z coordinates
-   */
   external void initFromArray(List<List<num>> a);
-
-  /**
-   * Return the interpolated point at k.
-   *
-   * @param k point index
-   */
   external SplineControlPoint getPoint(num k);
-
   external List<List<num>> getControlPointsArray();
 
 /*         getLength(num nSubDivisions ) # chunks: external List<num get >; total: external nu get m;
 		external set m(nu v); # ; */
-
-  /**
-   * Modifies the spline so that it looks similar to the original but has its points distributed in such way that moving along the spline it's done at a more or less constant speed. The points should also appear more uniformly spread along the curve.
-   * This is done by resampling the original spline, with the density of sampling controlled by samplingCoef. Here it's interesting to note that denser sampling is not necessarily better: if sampling is too high, you may get weird kinks in curvature.
-   *
-   * @param samplingCoef how mdynamic intermediate values to use between spline points
-   */
   external void reparametrizeByArcLength(num samplingCoef);
 }
 
-/**
- * ( export class Vector&lt;T&gt; )
- *
- * Abstract export class of Vector2, Vector3 and Vector4.
- * Currently the members of Vector is NOT type safe because it accepts different typed vectors.
- * Those definitions will be changed when TypeScript innovates Generics to be type safe.
- *
- * @example
-    THREE.Vector = new THREE.Vector3() * var v;
- * v.addVectors(new THREE.Vector2(0, 1), new THREE.Vector2(2, 3));
- */
+@JS()
+class Triangle {
+  external factory Triangle([Vector3 a, Vector3 b, Vector3 c]);
 
-/*@anonymous*/
+  external Vector3 get a;
+  external set a(Vector3 v);
+  external Vector3 get b;
+  external set b(Vector3 v);
+  external Vector3 get c;
+  external set c(Vector3 v);
+  external Triangle set(Vector3 a, Vector3 b, Vector3 c);
+  external Triangle setFromPointsAndIndices(
+      List<Vector3> points, num i0, num i1, num i2);
+  external Triangle clone();
+  external Triangle copy(Triangle triangle);
+  external num area();
+  external Vector3 midpoint(Vector3 optionalTarget);
+  external Vector3 normal(Vector3 optionalTarget);
+  external Plane plane(Vector3 optionalTarget);
+  external Vector3 barycoordFromPoint(Vector3 point, Vector3 optionalTarget);
+  external bool containsPoint(Vector3 point);
+  external bool equals(Triangle triangle);
+}
+
 @JS()
 class Vector {
   external factory Vector();
@@ -3404,19 +3096,7 @@ class Vector {
   external num lengthSq();
   external num length();
   external Vector normalize();
-
-  /**
-   * NOTE: Vector4 doesn't have the property.
-   *
-      num * distanceTo(T v );
-   */
   external num distanceTo(Vector v);
-
-  /**
-   * NOTE: Vector4 doesn't have the property.
-   *
-      num * distanceToSquared(T v );
-   */
   external num distanceToSquared(Vector v);
   external Vector setLength(num l);
   external Vector lerp(Vector v, num alpha);
@@ -3424,16 +3104,9 @@ class Vector {
   external Vector clone();
 }
 
-/**
- * 2D vector.
- *
- * ( class Vector2  )
- */
-
-/*@anonymous*/
 @JS()
-class Vector2 {
-  external factory Vector2(num x, num y);
+class Vector2 extends Vector {
+  external factory Vector2([num x, num y]);
 
   external num get x;
   external set x(num v);
@@ -3484,28 +3157,14 @@ class Vector2 {
   external bool equals(Vector2 v);
   external Vector2 fromArray(List<num> xy, num offset);
   external List<num> toArray(List<num> xy, num offset);
-  external Vector2 fromAttribute(BufferAttribute attribute, num index, num offset);
+  external Vector2 fromAttribute(
+      BufferAttribute attribute, num index, num offset);
   external Vector2 rotateAround(Vector2 center, num angle);
 }
 
-/**
- * 3D vector.
- *
- * @example
- * var a = new THREE.Vector3( 1, 0, 0 );
- * var b = new THREE.Vector3( 0, 1, 0 );
- * var c = new THREE.Vector3();
- * c.crossVectors( a, b );
- *
- * @see <a href="https:
- *
- * ( class Vector3  )
- */
-
-/*@anonymous*/
 @JS()
-class Vector3 {
-  external factory Vector3(num x, num y, num z);
+class Vector3 extends Vector {
+  external factory Vector3([num x, num y, num z]);
 
   external num get x;
   external set x(num v);
@@ -3574,19 +3233,13 @@ class Vector3 {
   external bool equals(Vector3 v);
   external Vector3 fromArray(List<num> xyz, num offset);
   external List<num> toArray(List<num> xyz, num offset);
-  external Vector3 fromAttribute(BufferAttribute attribute, num index, num offset);
+  external Vector3 fromAttribute(
+      BufferAttribute attribute, num index, num offset);
 }
 
-/**
- * 4D vector.
- *
- * ( class Vector4  )
- */
-
-/*@anonymous*/
 @JS()
-class Vector4 {
-  external factory Vector4(num x, num y, num z, num w);
+class Vector4 extends Vector {
+  external factory Vector4([num x, num y, num z, num w]);
 
   external num get x;
   external set x(num v);
@@ -3636,14 +3289,13 @@ class Vector4 {
   external Vector4 lerpVectors(Vector4 v1, Vector4 v2, num alpha);
   external bool equals(Vector4 v);
   external Vector4 fromArray(List<num> xyzw, num offset);
-  external List<num> toArray(List<num> xyzw, num offset);
-  external Vector4 fromAttribute(BufferAttribute attribute, num index, num offset);
+  external Vector4 fromAttribute(
+      BufferAttribute attribute, num index, num offset);
 }
 
-/*@anonymous*/
 @JS()
-class Bone {
-  external factory Bone /* extends Object3D */ (SkinnedMesh skin);
+class Bone extends Object3D {
+  external factory Bone([SkinnedMesh skin]);
 
   external SkinnedMesh get skin;
   external set skin(SkinnedMesh v);
@@ -3651,16 +3303,14 @@ class Bone {
   external Bone copy(Bone source);
 }
 
-/*@anonymous*/
 @JS()
-class Group {
-  external factory Group /* extends Object3D */ ();
+class Group extends Object3D {
+  external factory Group();
 }
 
-/*@anonymous*/
 @JS()
-class LOD {
-  external factory LOD /* extends Object3D */ ();
+class LOD extends Object3D {
+  external factory LOD();
 
   external List<dynamic> get levels;
   external set levels(List<dynamic> v);
@@ -3673,7 +3323,6 @@ class LOD {
   external dynamic toJSON(dynamic meta);
 }
 
-/*@anonymous*/
 @JS()
 class LensFlareProperty {
   external factory LensFlareProperty();
@@ -3702,30 +3351,30 @@ class LensFlareProperty {
   external set blending(Blending v);
 }
 
-/*@anonymous*/
 @JS()
-class LensFlare {
-  external factory LensFlare /* extends Object3D */ (
-      Texture texture, num size, num distance, Blending blending, Color color);
+class LensFlare extends Object3D {
+  external factory LensFlare(
+      [Texture texture,
+      num size,
+      num distance,
+      Blending blending,
+      Color color]);
 
   external List<LensFlareProperty> get lensFlares;
   external set lensFlares(List<LensFlareProperty> v);
   external Vector3 get positionScreen;
   external set positionScreen(Vector3 v);
   external void customUpdateCallback(LensFlare object);
-  external void add(Texture texture, num size, num distance, Blending blending, Color color);
-
-  //external void add(Object3D obj );
-
+  external void add(
+      Texture texture, num size, num distance, Blending blending, Color color);
   external void updateLensFlares();
   external LensFlare clone();
   external LensFlare copy(LensFlare source);
 }
 
-/*@anonymous*/
 @JS()
-class Line {
-  external factory Line /* extends Object3D */ (dynamic geometry, dynamic material, num mode);
+class Line extends Object3D {
+  external factory Line(dynamic geometry, dynamic material, num mode);
 
   external dynamic get geometry;
   external set geometry(dynamic v);
@@ -3736,19 +3385,19 @@ class Line {
   external Line copy(Line source);
 }
 
-/*@anonymous*/
 @JS()
-class LineSegments {
-  external factory LineSegments /* extends Line */ (dynamic geometry, dynamic material, num mode);
+class LineSegments extends Line {
+  external factory LineSegments(dynamic geometry, dynamic material, num mode);
 
   external LineSegments clone();
   external LineSegments copy(LineSegments source);
 }
 
-/*@anonymous*/
+enum LineMode { dummy }
+
 @JS()
-class Mesh extends Object3D{
-  external factory Mesh /* extends Object3D */ (Geometry geometry, Material material);
+class Mesh extends Object3D {
+  external factory Mesh([BufferGeometry geometry, Material material]);
 
   external dynamic get geometry;
   external set geometry(dynamic v);
@@ -3761,16 +3410,9 @@ class Mesh extends Object3D{
   external Mesh copy(Mesh source);
 }
 
-/**
- * A class for displaying particles in the form of variable size points. For example, if using the WebGLRenderer, the particles are displayed using GL_POINTS.
- *
- * @see <a href="https:
- */
-
-/*@anonymous*/
 @JS()
-class Points {
-  external factory Points /* extends Object3D */ (dynamic geometry, dynamic material);
+class Points extends Object3D {
+  external factory Points(dynamic geometry, dynamic material);
 
   external Geometry get geometry;
   external set geometry(Geometry v);
@@ -3782,10 +3424,10 @@ class Points {
   external Points copy(Points source);
 }
 
-/*@anonymous*/
 @JS()
 class Skeleton {
-  external factory Skeleton(List<Bone> bones, List<Matrix4> boneInverses, bool useVertexTexture);
+  external factory Skeleton(
+      [List<Bone> bones, List<Matrix4> boneInverses, bool useVertexTexture]);
 
   external bool get useVertexTexture;
   external set useVertexTexture(bool v);
@@ -3809,10 +3451,10 @@ class Skeleton {
   external Skeleton clone();
 }
 
-/*@anonymous*/
 @JS()
-class SkinnedMesh {
-  external factory SkinnedMesh /* extends Mesh */ (dynamic geometry, ShaderMaterial material, bool useVertexTexture);
+class SkinnedMesh extends Mesh {
+  external factory SkinnedMesh(
+      [dynamic geometry, ShaderMaterial material, bool useVertexTexture]);
 
   external String get bindMode;
   external set bindMode(String v);
@@ -3831,10 +3473,9 @@ class SkinnedMesh {
   external set skeleton(Skeleton v);
 }
 
-/*@anonymous*/
 @JS()
-class Sprite {
-  external factory Sprite /* extends Object3D */ (Material material);
+class Sprite extends Object3D {
+  external factory Sprite([Material material]);
 
   external BufferGeometry get geometry;
   external set geometry(BufferGeometry v);
@@ -3845,7 +3486,6 @@ class Sprite {
   external Sprite copy(Sprite source);
 }
 
-/*@anonymous*/
 @JS()
 class Renderer {
   external factory Renderer();
@@ -3856,7 +3496,6 @@ class Renderer {
   external set domElement(CanvasElement v);
 }
 
-/*@anonymous*/
 @JS()
 class WebGLRendererParameters {
   external factory WebGLRendererParameters();
@@ -3895,13 +3534,136 @@ class WebGLRendererParameters {
   external set logarithmicDepthBuffer(bool v);
 }
 
-/*@anonymous*/
+@JS()
+class WebGLRenderer {
+  external factory WebGLRenderer([WebGLRendererParameters parameters]);
+
+  external CanvasElement get domElement;
+  external set domElement(CanvasElement v);
+
+  external WebGLRenderingContext get context;
+  external set context(WebGLRenderingContext v);
+
+  external bool get autoClear;
+  external set autoClear(bool v);
+
+  external bool get autoClearColor;
+  external set autoClearColor(bool v);
+
+  external bool get autoClearDepth;
+  external set autoClearDepth(bool v);
+
+  external bool get autoClearStencil;
+  external set autoClearStencil(bool v);
+
+  external bool get sortObjects;
+  external set sortObjects(bool v);
+
+  external WebGLExtensions get extensions;
+  external set extensions(WebGLExtensions v);
+
+  external num get gammaFactor;
+  external set gammaFactor(num v);
+
+  external bool get gammaInput;
+  external set gammaInput(bool v);
+
+  external bool get gammaOutput;
+  external set gammaOutput(bool v);
+
+  external bool get shadowMapEnabled;
+  external set shadowMapEnabled(bool v);
+
+  external ShadowMapType get shadowMapType;
+  external set shadowMapType(ShadowMapType v);
+
+  external CullFace get shadowMapCullFace;
+  external set shadowMapCullFace(CullFace v);
+
+  external bool get shadowMapDebug;
+  external set shadowMapDebug(bool v);
+
+  external num get maxMorphTargets;
+  external set maxMorphTargets(num v);
+
+  external num get maxMorphNormals;
+  external set maxMorphNormals(num v);
+
+  external bool get autoScaleCubemaps;
+  external set autoScaleCubemaps(bool v);
+
+  external dynamic get info;
+  external set info(dynamic v);
+
+  external WebGLShadowMapInstance get shadowMap;
+  external set shadowMap(WebGLShadowMapInstance v);
+  external WebGLRenderingContext getContext();
+  external void forceContextLoss();
+
+  external WebGLCapabilities get capabilities;
+  external set capabilities(WebGLCapabilities v);
+
+  /** Deprecated, use capabilities instead */ external bool
+      supportsVertexTextures();
+  external bool supportsFloatTextures();
+  external bool supportsStandardDerivatives();
+  external bool supportsCompressedTextureS3TC();
+  external bool supportsCompressedTexturePVRTC();
+  external bool supportsBlendMinMax();
+  external String getPrecision();
+  external num getMaxAnisotropy();
+  external num getPixelRatio();
+  external void setPixelRatio(num value);
+
+/*         getSize() # width: external nu get m;
+		external set m(nu v); height: external nu get m;
+		external set m(nu v); # ; */
+  external void setSize(num width, num height, bool updateStyle);
+  external void setViewport(num x, num y, num width, num height);
+  external void setScissor(num x, num y, num width, num height);
+  external void enableScissorTest(bool enable);
+  external void setClearColor(String color, num alpha);
+  external void setClearAlpha(num alpha);
+  external void setClearColorHex(num hex, num alpha);
+  external Color getClearColor();
+  external num getClearAlpha();
+  external void clear(bool color, bool depth, bool stencil);
+  external void clearColor();
+  external void clearDepth();
+  external void clearStencil();
+  external void clearTarget(
+      WebGLRenderTarget renderTarget, bool color, bool depth, bool stencil);
+  external void resetGLState();
+  external void dispose();
+  external void updateShadowMap(Scene scene, Camera camera);
+  external void renderBufferImmediate(
+      Object3D object, Object program, Material material);
+  external void renderBufferDirect(Camera camera, List<Light> lights, Fog fog,
+      Material material, dynamic geometryGroup, Object3D object);
+  external void renderBuffer(Camera camera, List<Light> lights, Fog fog,
+      Material material, dynamic geometryGroup, Object3D object);
+  external void render(
+      Scene scene, Camera camera, RenderTarget renderTarget, bool forceClear);
+  external void renderImmediateObject(Camera camera, List<Light> lights,
+      Fog fog, Material material, Object3D object);
+  external void setFaceCulling(CullFace cullFace, FrontFaceDirection frontFace);
+  external void setMaterialFaces(Material material);
+  external void setDepthTest(bool depthTest);
+  external void setDepthWrite(bool depthWrite);
+  external void setBlending(Blending blending, BlendingEquation blendEquation,
+      BlendingSrcFactor blendSrc, BlendingDstFactor blendDst);
+  external void uploadTexture(Texture texture);
+  external void setTexture(Texture texture, num slot);
+  external void setRenderTarget(RenderTarget renderTarget);
+  external void readRenderTargetPixels(RenderTarget renderTarget, num x, num y,
+      num width, num height, dynamic buffer);
+}
+
 @JS()
 class RenderTarget {
   external factory RenderTarget();
 }
 
-/*@anonymous*/
 @JS()
 class WebGLRenderTargetOptions {
   external factory WebGLRenderTargetOptions();
@@ -3926,10 +3688,10 @@ class WebGLRenderTargetOptions {
   external set stencilBuffer(bool v);
 }
 
-/*@anonymous*/
 @JS()
 class WebGLRenderTarget {
-  external factory WebGLRenderTarget(num width, num height, WebGLRenderTargetOptions options);
+  external factory WebGLRenderTarget(
+      [num width, num height, WebGLRenderTargetOptions options]);
 
   external String get uuid;
   external set uuid(String v);
@@ -3977,17 +3739,15 @@ class WebGLRenderTarget {
 
 }
 
-/*@anonymous*/
 @JS()
-class WebGLRenderTargetCube {
-  external factory WebGLRenderTargetCube /* extends WebGLRenderTarget */ (
-      num width, num height, WebGLRenderTargetOptions options);
+class WebGLRenderTargetCube extends WebGLRenderTarget {
+  external factory WebGLRenderTargetCube(
+      [num width, num height, WebGLRenderTargetOptions options]);
 
   external num get activeCubeFace;
   external set activeCubeFace(num v);
 }
 
-/*@anonymous*/
 @JS()
 class ShaderChunk {
   external factory ShaderChunk();
@@ -4128,7 +3888,6 @@ class ShaderChunk {
   external set worldpos_vertex(String v);
 }
 
-/*@anonymous*/
 @JS()
 class Shader {
   external factory Shader();
@@ -4141,7 +3900,6 @@ class Shader {
   external set fragmentShader(String v);
 }
 
-/*@anonymous*/
 @JS()
 class ShaderLib {
   external factory ShaderLib();
@@ -4172,7 +3930,6 @@ class ShaderLib {
   external set depthRGBA(Shader v);
 }
 
-/*@anonymous*/
 @JS()
 class UniformsLib {
   external factory UniformsLib();
@@ -4201,7 +3958,6 @@ class UniformsLib {
   external set shadowmap(dynamic v);
 }
 
-/*@anonymous*/
 @JS()
 class UniformsUtils {
   external factory UniformsUtils();
@@ -4210,7 +3966,56 @@ class UniformsUtils {
   external dynamic clone(dynamic uniforms_src);
 }
 
-/*@anonymous*/
+@JS()
+class WebGLBufferRenderer {
+  external factory WebGLBufferRenderer(
+      [dynamic _gl, dynamic extensions, dynamic _infoRender]);
+
+  external void setMode(dynamic value);
+  external void render(dynamic start, dynamic count);
+  external void renderInstances(dynamic geometry);
+}
+
+@JS()
+class WebGLCapabilities {
+  external factory WebGLCapabilities(
+      [dynamic gl, dynamic extensions, dynamic parameters]);
+
+  external dynamic get getMaxPrecision;
+  external set getMaxPrecision(dynamic v);
+  external dynamic get precision;
+  external set precision(dynamic v);
+  external dynamic get maxTextures;
+  external set maxTextures(dynamic v);
+  external dynamic get maxVertexTextures;
+  external set maxVertexTextures(dynamic v);
+  external dynamic get maxTextureSize;
+  external set maxTextureSize(dynamic v);
+  external dynamic get maxCubemapSize;
+  external set maxCubemapSize(dynamic v);
+  external dynamic get maxAttributes;
+  external set maxAttributes(dynamic v);
+  external dynamic get maxVertexUniforms;
+  external set maxVertexUniforms(dynamic v);
+  external dynamic get maxVaryings;
+  external set maxVaryings(dynamic v);
+  external dynamic get maxFragmentUniforms;
+  external set maxFragmentUniforms(dynamic v);
+  external dynamic get vertexTextures;
+  external set vertexTextures(dynamic v);
+  external dynamic get floatFragmentTextures;
+  external set floatFragmentTextures(dynamic v);
+  external dynamic get floatVertexTextures;
+  external set floatVertexTextures(dynamic v);
+}
+
+@JS()
+class WebGLExtensions {
+  external factory WebGLExtensions([dynamic gl]);
+
+  external dynamic get(String name);
+}
+
 @JS()
 class WebGLGeometriesInstance {
   external factory WebGLGeometriesInstance();
@@ -4218,7 +4023,16 @@ class WebGLGeometriesInstance {
   external dynamic get(dynamic object);
 }
 
-/*@anonymous*/
+@JS()
+class WebGLGeometriesStatic {
+  external factory WebGLGeometriesStatic();
+
+  /* external factory WebGLGeometriesInstance (dynamic gl , dynamic properties , dynamic info ); */
+
+}
+
+external int get WebGLGeometries;
+
 @JS()
 class WebGLIndexedBufferRendererInstance {
   external factory WebGLIndexedBufferRendererInstance();
@@ -4229,7 +4043,16 @@ class WebGLIndexedBufferRendererInstance {
   external void renderInstances(dynamic geometry);
 }
 
-/*@anonymous*/
+@JS()
+class WebGLIndexedBufferRendererStatic {
+  external factory WebGLIndexedBufferRendererStatic();
+
+  /* external factory WebGLIndexedBufferRendererInstance (dynamic gl , dynamic properties , dynamic info ); */
+
+}
+
+external int get WebGLIndexedBufferRenderer;
+
 @JS()
 class WebGLObjectsInstance {
   external factory WebGLObjectsInstance();
@@ -4239,18 +4062,72 @@ class WebGLObjectsInstance {
   external void update(dynamic object);
 }
 
-/*@anonymous*/
+@JS()
+class WebGLObjectsStatic {
+  external factory WebGLObjectsStatic();
+
+  /* external factory WebGLObjectsInstance (dynamic gl , dynamic properties , dynamic info ); */
+
+}
+
+external int get WebGLObjects;
+
+@JS()
+class WebGLProgram {
+  external factory WebGLProgram(
+      [WebGLRenderer renderer,
+      String code,
+      ShaderMaterial material,
+      WebGLRendererParameters parameters]);
+
+  external Func0<dynamic> get getUniforms;
+  external set getUniforms(Func0<dynamic> v);
+  external Func0<dynamic> get getAttributes;
+  external set getAttributes(Func0<dynamic> v);
+
+  /** Deprecated, use getUniforms */
+  external dynamic get uniforms;
+  external set uniforms(dynamic v);
+  /** Deprecated, use getAttributes */
+  external dynamic get attributes;
+  external set attributes(dynamic v);
+
+  external num get id;
+  external set id(num v);
+  external String get code;
+  external set code(String v);
+  external num get usedTimes;
+  external set usedTimes(num v);
+  external dynamic get program;
+  external set program(dynamic v);
+  external WebGLShader get vertexShader;
+  external set vertexShader(WebGLShader v);
+  external WebGLShader get fragmentShader;
+  external set fragmentShader(WebGLShader v);
+}
+
 @JS()
 class WebGLProgramsInstance {
   external factory WebGLProgramsInstance();
 
-  external List<dynamic> getParameters(dynamic material, dynamic lights, dynamic fog, dynamic object);
+  external List<dynamic> getParameters(
+      dynamic material, dynamic lights, dynamic fog, dynamic object);
   external dynamic getProgramCode(dynamic material, dynamic parameters);
-  external dynamic acquireProgram(dynamic material, dynamic parameters, dynamic code);
+  external dynamic acquireProgram(
+      dynamic material, dynamic parameters, dynamic code);
   external void releaseProgram(dynamic program);
 }
 
-/*@anonymous*/
+@JS()
+class WebGLProgramsStatic {
+  external factory WebGLProgramsStatic();
+
+  /* external factory WebGLProgramsInstance (WebGLRenderer renderer , dynamic capabilities ); */
+
+}
+
+external int get WebGLPrograms;
+
 @JS()
 class WebGLPropertiesInstance {
   external factory WebGLPropertiesInstance();
@@ -4260,25 +4137,122 @@ class WebGLPropertiesInstance {
   external void clear();
 }
 
-/*@anonymous*/
+@JS()
+class WebGLPropertiesStatic {
+  external factory WebGLPropertiesStatic();
+
+  /* external factory WebGLPropertiesInstance (); */
+
+}
+
+external int get WebGLProperties;
+
+@JS()
+class WebGLShader {
+  external factory WebGLShader([dynamic gl, String type, String String]);
+}
+
+@JS()
+class WebGLShadowMapInstance {
+  external factory WebGLShadowMapInstance();
+
+  external bool get enabled;
+  external set enabled(bool v);
+  external bool get autoUpdate;
+  external set autoUpdate(bool v);
+  external bool get needsUpdate;
+  external set needsUpdate(bool v);
+  external ShadowMapType get type;
+  external set type(ShadowMapType v);
+  external CullFace get cullFace;
+  external set cullFace(CullFace v);
+  external void render(Scene scene);
+}
+
+@JS()
+class WebGLShadowMapStatic {
+  external factory WebGLShadowMapStatic();
+
+  /* external factory WebGLStateInstance ( Renderer _renderer , List<dynamic> _lights , List<dynamic> _objects ); */
+
+}
+
+external int get WebGLShadowMap;
+
+@JS()
+class WebGLStateInstance {
+  external factory WebGLStateInstance();
+
+  external void init();
+  external void initAttributes();
+  external void enableAttribute(String attribute);
+  external void enableAttributeAndDivisor(
+      String attribute, dynamic meshPerAttribute, dynamic extension);
+  external void disableUnusedAttributes();
+  external void enable(String id);
+  external void disable(String id);
+  external Func0<dynamic> get getCompressedTextureFormats;
+  external set getCompressedTextureFormats(Func0<dynamic> v);
+  external void setBlending(
+      num blending,
+      num blendEquation,
+      num blendSrc,
+      num blendDst,
+      num blendEquationAlpha,
+      num blendSrcAlpha,
+      num blendDstAlpha);
+  external void setDepthFunc(Function func);
+  external void setDepthTest(num depthTest);
+  external void setDepthWrite(num depthWrite);
+  external void setColorWrite(num colorWrite);
+  external void setFlipSided(num flipSided);
+  external void setLineWidth(num width);
+  external void setPolygonOffset(num polygonoffset, num factor, num units);
+  external void setScissorTest(bool scissorTest);
+  external void activeTexture(dynamic webglSlot);
+  external void bindTexture(dynamic webglType, dynamic webglTexture);
+  external void compressedTexImage2D();
+  external void texImage2D();
+  external void reset();
+}
+
+@JS()
+class WebGLStateStatic {
+  external factory WebGLStateStatic();
+
+  /* external factory WebGLStateInstance ( dynamic gl , dynamic extensions , Function paramThreeToGL ); */
+
+}
+
+external int get WebGLState;
+
+@JS()
+class RendererPlugin {
+  external factory RendererPlugin();
+
+  external void init(WebGLRenderer renderer);
+  external void render(
+      Scene scene, Camera camera, num currentWidth, num currentHeight);
+}
+
 @JS()
 class LensFlarePlugin {
   external factory LensFlarePlugin();
 
   external void init(Renderer renderer);
-  external void render(Scene scene, Camera camera, num viewportWidth, num viewportHeight);
+  external void render(
+      Scene scene, Camera camera, num viewportWidth, num viewportHeight);
 }
 
-/*@anonymous*/
 @JS()
 class SpritePlugin {
   external factory SpritePlugin();
 
   external void init(Renderer renderer);
-  external void render(Scene scene, Camera camera, num viewportWidth, num viewportHeight);
+  external void render(
+      Scene scene, Camera camera, num viewportWidth, num viewportHeight);
 }
 
-/*@anonymous*/
 @JS()
 class IFog {
   external factory IFog();
@@ -4290,10 +4264,9 @@ class IFog {
   external IFog clone();
 }
 
-/*@anonymous*/
 @JS()
 class Fog {
-  external factory Fog(num hex, num near, num far);
+  external factory Fog([num hex, num near, num far]);
 
   external String get name;
   external set name(String v);
@@ -4309,10 +4282,9 @@ class Fog {
   external Fog clone();
 }
 
-/*@anonymous*/
 @JS()
 class FogExp2 {
-  external factory FogExp2(dynamic hex, num density);
+  external factory FogExp2([dynamic hex, num density]);
 
   external String get name;
   external set name(String v);
@@ -4324,10 +4296,9 @@ class FogExp2 {
   external FogExp2 clone();
 }
 
-/*@anonymous*/
 @JS()
-class Scene {
-  external factory Scene /* extends Object3D */ ();
+class Scene extends Object3D {
+  external factory Scene();
 
   external IFog get fog;
   external set fog(IFog v);
@@ -4339,20 +4310,26 @@ class Scene {
   external Scene copy(Scene source);
 }
 
-/*@anonymous*/
 @JS()
-class CanvasTexture {
-  external factory CanvasTexture /* extends Texture */ (dynamic canvas, Mapping mapping, Wrapping wrapS, Wrapping wrapT,
-                                                        TextureFilter magFilter, TextureFilter minFilter, PixelFormat format, TextureDataType type, num anisotropy);
+class CanvasTexture extends Texture {
+  external factory CanvasTexture(
+      dynamic canvas,
+      Mapping mapping,
+      Wrapping wrapS,
+      Wrapping wrapT,
+      TextureFilter magFilter,
+      TextureFilter minFilter,
+      PixelFormat format,
+      TextureDataType type,
+      num anisotropy);
 
   external bool get needsUpdate;
   external set needsUpdate(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class CompressedTexture {
-  external factory CompressedTexture /* extends Texture */ (
+class CompressedTexture extends Texture {
+  external factory CompressedTexture(
       List<ImageData> mipmaps,
       num width,
       num height,
@@ -4376,10 +4353,9 @@ class CompressedTexture {
   external set generateMipmaps(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class CubeTexture {
-  external factory CubeTexture /* extends Texture */ (
+class CubeTexture extends Texture {
+  external factory CubeTexture(
       List<dynamic> images,
       Mapping mapping,
       Wrapping wrapS,
@@ -4395,10 +4371,9 @@ class CubeTexture {
   external CubeTexture copy(CubeTexture source);
 }
 
-/*@anonymous*/
 @JS()
-class DataTexture {
-  external factory DataTexture /* extends Texture */ (
+class DataTexture extends Texture {
+  external factory DataTexture(
       ImageData data,
       num width,
       num height,
@@ -4425,11 +4400,18 @@ class DataTexture {
   external set generateMipmaps(bool v);
 }
 
-/*@anonymous*/
 @JS()
 class Texture {
-  external factory Texture(dynamic image, Mapping mapping, Wrapping wrapS, Wrapping wrapT, TextureFilter magFilter,
-                           TextureFilter minFilter, PixelFormat format, TextureDataType type, num anisotropy);
+  external factory Texture(
+      dynamic image,
+      Mapping mapping,
+      Wrapping wrapS,
+      Wrapping wrapT,
+      TextureFilter magFilter,
+      TextureFilter minFilter,
+      PixelFormat format,
+      TextureDataType type,
+      num anisotropy);
 
   external num get id;
   external set id(num v);
@@ -4475,10 +4457,10 @@ class Texture {
   external set version(num v);
   external bool get needsUpdate;
   external set needsUpdate(bool v);
-  external void onUpdate();
+  external VoidFunc0 get onUpdate;
+  external set onUpdate(VoidFunc0 v);
   external static dynamic get DEFAULT_IMAGE;
   external static dynamic get DEFAULT_MAPPING;
-
   external Texture clone();
   external Texture copy(Texture source);
   external dynamic toJSON(dynamic meta);
@@ -4494,32 +4476,49 @@ class Texture {
 
 }
 
-/*@anonymous*/
+@JS()
+class VideoTexture extends Texture {
+  external factory VideoTexture(
+      VideoElement video,
+      Mapping mapping,
+      Wrapping wrapS,
+      Wrapping wrapT,
+      TextureFilter magFilter,
+      TextureFilter minFilter,
+      PixelFormat format,
+      TextureDataType type,
+      num anisotropy);
+
+  external bool get generateMipmaps;
+  external set generateMipmaps(bool v);
+}
+
+/* already defined */
+
 @JS()
 class ImageUtils {
   external factory ImageUtils();
 
   external String get crossOrigin;
   external set crossOrigin(String v);
-
-  external Texture loadTexture(String url, Mapping mapping, VoidFunc1<Texture> onLoad, VoidFunc1<String> onError);
-  external Texture loadTextureCube(
-      List<String> array, Mapping mapping, VoidFunc1<Texture> onLoad, VoidFunc1<String> onError);
+  external Texture loadTexture(String url, Mapping mapping,
+      VoidFunc1<Texture> onLoad, VoidFunc1<String> onError);
+  external Texture loadTextureCube(List<String> array, Mapping mapping,
+      VoidFunc1<Texture> onLoad, VoidFunc1<String> onError);
   external CanvasElement getNormalMap(ImageElement image, num depth);
   external DataTexture generateDataTexture(num width, num height, Color color);
 }
 
-/*@anonymous*/
 @JS()
 class SceneUtils {
   external factory SceneUtils();
 
-  external Object3D createMultiMaterialObject(Geometry geometry, List<Material> materials);
+  external Object3D createMultiMaterialObject(
+      Geometry geometry, List<Material> materials);
   external void detach(Object3D child, Object3D parent, Scene scene);
   external void attach(Object3D child, Scene scene, Object3D parent);
 }
 
-/*@anonymous*/
 @JS()
 class ShapeUtils {
   external factory ShapeUtils();
@@ -4532,13 +4531,20 @@ class ShapeUtils {
   external num b3(num t, num p0, num p1, num p2, num p3);
 }
 
-/*@anonymous*/
 @JS()
-class Audio {
-  external factory Audio /* extends Object3D */ (AudioListener listener);
+class Audio extends Object3D {
+  external factory Audio([AudioListener listener]);
 
   external String get type;
   external set type(String v);
+  external AudioContext get context;
+  external set context(AudioContext v);
+  external AudioBufferSourceNode get source;
+  external set source(AudioBufferSourceNode v);
+  external GainNode get gain;
+  external set gain(GainNode v);
+  external PannerNode get panner;
+  external set panner(PannerNode v);
   external bool get autoplay;
   external set autoplay(bool v);
   external num get startTime;
@@ -4569,18 +4575,36 @@ class Audio {
   external void updateMatrixWorld(bool force);
 }
 
-/*@anonymous*/
 @JS()
-class AudioListener {
-  external factory AudioListener /* extends Object3D */ ();
+class AudioListener extends Object3D {
+  external factory AudioListener();
 
   external String get type;
   external set type(String v);
-
+  external AudioContext get context;
+  external set context(AudioContext v);
   external void updateMatrixWorld(bool force);
 }
 
-/*@anonymous*/
+@JS()
+class Curve {
+  external factory Curve();
+
+  external dynamic getPoint(num t);
+  external Vector getPointAt(num u);
+  external List<Vector> getPoints(num divisions);
+  external List<Vector> getSpacedPoints(num divisions);
+  external num getLength();
+  external List<num> getLengths(num divisions);
+  external void updateArcLengths();
+  external num getUtoTmapping(num u, num distance);
+  external dynamic getTangent(num t);
+  external dynamic getTangentAt(num u);
+
+  external static Function create(
+      Function constructorFunc, Function getPointFunc);
+}
+
 @JS()
 class CurveUtils {
   external factory CurveUtils();
@@ -4591,7 +4615,6 @@ class CurveUtils {
   external num interpolate(num p0, num p1, num p2, num p3, num t);
 }
 
-/*@anonymous*/
 @JS()
 class BoundingBox {
   external factory BoundingBox();
@@ -4610,71 +4633,498 @@ class BoundingBox {
   external set maxZ(num v);
 }
 
-/*@anonymous*/
+@JS()
+class CurvePath extends Curve<T> {
+  external factory CurvePath();
+
+  external List<Curve<T>> get curves;
+  external set curves(List<Curve<T>> v);
+  external bool get autoClose;
+  external set autoClose(bool v);
+  external void add(Curve<T> curve);
+  external bool checkConnection();
+  external void closePath();
+  external dynamic getPoint(num t);
+  external num getLength();
+  external List<num> getCurveLengths();
+  external Geometry createPointsGeometry(num divisions);
+  external Geometry createSpacedPointsGeometry(num divisions);
+  external Geometry createGeometry(List<Vector> points);
+}
+
+enum PathActions {
+  MOVE_TO,
+  LINE_TO,
+  QUADRATIC_CURVE_TO,
+  BEZIER_CURVE_TO,
+  CSPLINE_THRU,
+  ARC,
+  ELLIPSE,
+}
+
 @JS()
 class PathAction {
   external factory PathAction();
 
+  external PathActions get action;
+  external set action(PathActions v);
   external dynamic get args;
   external set args(dynamic v);
 }
 
-/*@anonymous*/
 @JS()
-class ArcCurve {
-  external factory ArcCurve /* extends EllipseCurve */ (
-      num aX, num aY, num aRadius, num aStartAngle, num aEndAngle, bool aClockwise);
+class Path extends CurvePath<Vector2> {
+  external factory Path([List<Vector2> points]);
+
+  external List<PathAction> get actions;
+  external set actions(List<PathAction> v);
+  external void fromPoints(List<Vector2> vectors);
+  external void moveTo(num x, num y);
+  external void lineTo(num x, num y);
+  external void quadraticCurveTo(num aCPx, num aCPy, num aX, num aY);
+  external void bezierCurveTo(
+      num aCP1x, num aCP1y, num aCP2x, num aCP2y, num aX, num aY);
+  external void splineThru(List<Vector2> pts);
+  external void arc(num aX, num aY, num aRadius, num aStartAngle, num aEndAngle,
+      bool aClockwise);
+  external void absarc(num aX, num aY, num aRadius, num aStartAngle,
+      num aEndAngle, bool aClockwise);
+  external void ellipse(num aX, num aY, num xRadius, num yRadius,
+      num aStartAngle, num aEndAngle, bool aClockwise, num aRotation);
+  external void absellipse(num aX, num aY, num xRadius, num yRadius,
+      num aStartAngle, num aEndAngle, bool aClockwise, num aRotation);
+  external List<Vector2> getSpacedPoints(num divisions, bool closedPath);
+  external List<Vector2> getPoints(num divisions, bool closedPath);
+  external List<Shape> toShapes();
 }
 
-/*@anonymous*/
 @JS()
-class CubeGeometry extends Geometry{
-  external factory CubeGeometry(num w, num h, num d, [num ws, num hs, num ds]) /* extends BoxGeometry */;
+class Shape extends Path {
+  external factory Shape([List<Vector2> points]);
+
+  external List<Path> get holes;
+  external set holes(List<Path> v);
+  external ExtrudeGeometry extrude(dynamic options);
+  external ShapeGeometry makeGeometry(dynamic options);
+  external List<List<Vector2>> getPointsHoles(num divisions);
+  external dynamic extractAllPoints(num points);
+  external List<Vector2> extractPoints(num divisions);
 }
 
-/*@anonymous*/
 @JS()
-class EdgesGeometry {
-  external factory EdgesGeometry /* extends BufferGeometry */ (BufferGeometry geometry, num thresholdAngle);
+class ArcCurve extends EllipseCurve {
+  external factory ArcCurve(
+      [num aX,
+      num aY,
+      num aRadius,
+      num aStartAngle,
+      num aEndAngle,
+      bool aClockwise]);
+}
+
+@JS()
+class CatmullRomCurve3 extends Curve<Vector3> {
+  external factory CatmullRomCurve3();
+}
+
+@JS()
+class ClosedSplineCurve3 extends Curve<Vector3> {
+  external factory ClosedSplineCurve3([List<Vector3> points]);
+
+  external List<Vector3> get points;
+  external set points(List<Vector3> v);
+}
+
+@JS()
+class CubicBezierCurve extends Curve<Vector2> {
+  external factory CubicBezierCurve(
+      [Vector2 v0, Vector2 v1, Vector2 v2, Vector2 v3]);
+
+  external Vector2 get v0;
+  external set v0(Vector2 v);
+  external Vector2 get v1;
+  external set v1(Vector2 v);
+  external Vector2 get v2;
+  external set v2(Vector2 v);
+  external Vector2 get v3;
+  external set v3(Vector2 v);
+}
+
+@JS()
+class CubicBezierCurve3 extends Curve<Vector3> {
+  external factory CubicBezierCurve3(
+      [Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3]);
+
+  external Vector3 get v0;
+  external set v0(Vector3 v);
+  external Vector3 get v1;
+  external set v1(Vector3 v);
+  external Vector3 get v2;
+  external set v2(Vector3 v);
+  external Vector3 get v3;
+  external set v3(Vector3 v);
+}
+
+@JS()
+class EllipseCurve extends Curve<Vector2> {
+  external factory EllipseCurve(
+      [num aX,
+      num aY,
+      num xRadius,
+      num yRadius,
+      num aStartAngle,
+      num aEndAngle,
+      bool aClockwise,
+      num aRotation]);
+
+  external num get aX;
+  external set aX(num v);
+  external num get aY;
+  external set aY(num v);
+  external num get xRadius;
+  external set xRadius(num v);
+  external num get yRadius;
+  external set yRadius(num v);
+  external num get aStartAngle;
+  external set aStartAngle(num v);
+  external num get aEndAngle;
+  external set aEndAngle(num v);
+  external bool get aClockwise;
+  external set aClockwise(bool v);
+  external num get aRotation;
+  external set aRotation(num v);
+}
+
+@JS()
+class LineCurve extends Curve<Vector2> {
+  external factory LineCurve([Vector2 v1, Vector2 v2]);
+
+  external Vector2 get v1;
+  external set v1(Vector2 v);
+  external Vector2 get v2;
+  external set v2(Vector2 v);
+}
+
+@JS()
+class LineCurve3 extends Curve<Vector3> {
+  external factory LineCurve3([Vector3 v1, Vector3 v2]);
+
+  external Vector3 get v1;
+  external set v1(Vector3 v);
+  external Vector3 get v2;
+  external set v2(Vector3 v);
+}
+
+@JS()
+class QuadraticBezierCurve extends Curve<Vector2> {
+  external factory QuadraticBezierCurve([Vector2 v0, Vector2 v1, Vector2 v2]);
+
+  external Vector2 get v0;
+  external set v0(Vector2 v);
+  external Vector2 get v1;
+  external set v1(Vector2 v);
+  external Vector2 get v2;
+  external set v2(Vector2 v);
+}
+
+@JS()
+class QuadraticBezierCurve3 extends Curve<Vector3> {
+  external factory QuadraticBezierCurve3([Vector3 v0, Vector3 v1, Vector3 v2]);
+
+  external Vector3 get v0;
+  external set v0(Vector3 v);
+  external Vector3 get v1;
+  external set v1(Vector3 v);
+  external Vector3 get v2;
+  external set v2(Vector3 v);
+}
+
+@JS()
+class SplineCurve extends Curve<Vector2> {
+  external factory SplineCurve([List<Vector2> points]);
+
+  external List<Vector2> get points;
+  external set points(List<Vector2> v);
+}
+
+@JS()
+class SplineCurve3 extends Curve<Vector3> {
+  external factory SplineCurve3([List<Vector3> points]);
+
+  external List<Vector3> get points;
+  external set points(List<Vector3> v);
+}
+
+@JS()
+class BoxGeometry extends Geometry {
+  external factory BoxGeometry(
+      [num width,
+      num height,
+      num depth,
+      num widthSegments,
+      num heightSegments,
+      num depthSegments]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external BoxGeometry clone();
+}
+
+@JS()
+class CircleBufferGeometry extends Geometry {
+  external factory CircleBufferGeometry(
+      [num radius, num segments, num thetaStart, num thetaLength]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external CircleBufferGeometry clone();
+}
+
+@JS()
+class CircleGeometry extends Geometry {
+  external factory CircleGeometry(
+      [num radius, num segments, num thetaStart, num thetaLength]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external CircleGeometry clone();
+}
+
+@JS()
+class CubeGeometry extends BoxGeometry {
+  external factory CubeGeometry();
+}
+
+@JS()
+class CylinderGeometry extends Geometry {
+  external factory CylinderGeometry(
+      [num radiusTop,
+      num radiusBottom,
+      num height,
+      num radiusSegments,
+      num heightSegments,
+      bool openEnded,
+      num thetaStart,
+      num thetaLength]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external CylinderGeometry clone();
+}
+
+@JS()
+class DodecahedronGeometry extends Geometry {
+  external factory DodecahedronGeometry([num radius, num detail]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external DodecahedronGeometry clone();
+}
+
+@JS()
+class EdgesGeometry extends BufferGeometry {
+  external factory EdgesGeometry([BufferGeometry geometry, num thresholdAngle]);
 
   external EdgesGeometry clone();
 }
 
-/*@anonymous*/
 @JS()
-class IcosahedronGeometry {
-  external factory IcosahedronGeometry /* extends PolyhedronGeometry */ (num radius, num detail);
+class ExtrudeGeometry extends Geometry {
+  external factory ExtrudeGeometry([List<Shape> shapes, dynamic options]);
+
+  external static dynamic get WorldUVGenerator;
+  external void addShapeList(List<Shape> shapes, dynamic options);
+  external void addShape(Shape shape, dynamic options);
+}
+
+@JS()
+class IcosahedronGeometry extends PolyhedronGeometry {
+  external factory IcosahedronGeometry([num radius, num detail]);
 
   external IcosahedronGeometry clone();
 }
 
-/*@anonymous*/
 @JS()
-class OctahedronGeometry {
-  external factory OctahedronGeometry /* extends PolyhedronGeometry */ (num radius, num detail);
+class LatheGeometry extends Geometry {
+  external factory LatheGeometry(
+      [List<Vector3> points, num segments, num phiStart, num phiLength]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+}
+
+@JS()
+class OctahedronGeometry extends PolyhedronGeometry {
+  external factory OctahedronGeometry([num radius, num detail]);
 
   external OctahedronGeometry clone();
 }
 
-/*@anonymous*/
 @JS()
-class TetrahedronGeometry {
-  external factory TetrahedronGeometry /* extends PolyhedronGeometry */ (num radius, num detail);
+class ParametricGeometry extends Geometry {
+  external factory ParametricGeometry(
+      [Func2<num, num, Vector3> func, num slices, num stacks]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+}
+
+@JS()
+class PlaneBufferGeometry extends BufferGeometry {
+  external factory PlaneBufferGeometry(
+      [num width, num height, num widthSegments, num heightSegments]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external PlaneBufferGeometry clone();
+}
+
+@JS()
+class PlaneGeometry extends Geometry {
+  external factory PlaneGeometry(
+      [num width, num height, num widthSegments, num heightSegments]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external PlaneGeometry clone();
+}
+
+@JS()
+class PolyhedronGeometry extends Geometry {
+  external factory PolyhedronGeometry(
+      [List<Vector3> vertices, List<Face3> faces, num radius, num detail]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external PolyhedronGeometry clone();
+}
+
+@JS()
+class RingGeometry extends Geometry {
+  external factory RingGeometry(
+      [num innerRadius,
+      num outerRadius,
+      num thetaSegments,
+      num phiSegments,
+      num thetaStart,
+      num thetaLength]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external RingGeometry clone();
+}
+
+@JS()
+class ShapeGeometry extends Geometry {
+  external factory ShapeGeometry([List<Shape> shapes, dynamic options]);
+
+  external ShapeGeometry addShapeList(List<Shape> shapes, dynamic options);
+  external void addShape(Shape shape, dynamic options);
+}
+
+@JS()
+class SphereBufferGeometry extends BufferGeometry {
+  external factory SphereBufferGeometry(
+      [num radius,
+      num widthSegments,
+      num heightSegments,
+      num phiStart,
+      num phiLength,
+      num thetaStart,
+      num thetaLength]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external SphereBufferGeometry clone();
+}
+
+@JS()
+class SphereGeometry extends Geometry {
+  external factory SphereGeometry(
+      [num radius,
+      num widthSegments,
+      num heightSegments,
+      num phiStart,
+      num phiLength,
+      num thetaStart,
+      num thetaLength]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+}
+
+@JS()
+class TetrahedronGeometry extends PolyhedronGeometry {
+  external factory TetrahedronGeometry([num radius, num detail]);
 
   external TetrahedronGeometry clone();
 }
 
-/*@anonymous*/
 @JS()
-class WireframeGeometry {
-  external factory WireframeGeometry /* extends BufferGeometry */ (dynamic geometry);
+class TorusGeometry extends Geometry {
+  external factory TorusGeometry(
+      [num radius, num tube, num radialSegments, num tubularSegments, num arc]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external TorusGeometry clone();
 }
 
-/*@anonymous*/
 @JS()
-class ArrowHelper {
-  external factory ArrowHelper /* extends Object3D */ (
-      Vector3 dir, Vector3 origin, num length, num hex, num headLength, num headWidth);
+class TorusKnotGeometry extends Geometry {
+  external factory TorusKnotGeometry(
+      [num radius,
+      num tube,
+      num radialSegments,
+      num tubularSegments,
+      num p,
+      num q,
+      num heightScale]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external TorusKnotGeometry clone();
+}
+
+@JS()
+class TubeGeometry extends Geometry {
+  external factory TubeGeometry(
+      [Path path,
+      num segments,
+      num radius,
+      num radiusSegments,
+      bool closed,
+      Func1<num, num> taper]);
+
+  external dynamic get parameters;
+  external set parameters(dynamic v);
+  external List<Vector3> get tangents;
+  external set tangents(List<Vector3> v);
+  external List<Vector3> get normals;
+  external set normals(List<Vector3> v);
+  external List<Vector3> get binormals;
+  external set binormals(List<Vector3> v);
+
+  external static num NoTaper(num u);
+  external static num SinusoidalTaper(num u);
+  external static void FrenetFrames(Path path, num segments, bool closed);
+  external TubeGeometry clone();
+}
+
+@JS()
+class WireframeGeometry extends BufferGeometry {
+  external factory WireframeGeometry([dynamic geometry]);
+}
+
+@JS()
+class ArrowHelper extends Object3D {
+  external factory ArrowHelper(
+      [Vector3 dir,
+      Vector3 origin,
+      num length,
+      num hex,
+      num headLength,
+      num headWidth]);
 
   external Line get line;
   external set line(Line v);
@@ -4685,16 +5135,14 @@ class ArrowHelper {
   external void setColor(num hex);
 }
 
-/*@anonymous*/
 @JS()
-class AxisHelper {
-  external factory AxisHelper /* extends LineSegments */ (num size);
+class AxisHelper extends LineSegments {
+  external factory AxisHelper([num size]);
 }
 
-/*@anonymous*/
 @JS()
-class BoundingBoxHelper {
-  external factory BoundingBoxHelper /* extends Mesh */ (Object3D object, num hex);
+class BoundingBoxHelper extends Mesh {
+  external factory BoundingBoxHelper([Object3D object, num hex]);
 
   external Object3D get object;
   external set object(Object3D v);
@@ -4703,28 +5151,26 @@ class BoundingBoxHelper {
   external void update();
 }
 
-/*@anonymous*/
 @JS()
-class BoxHelper {
-  external factory BoxHelper /* extends LineSegments */ (Object3D object);
+class BoxHelper extends LineSegments {
+  external factory BoxHelper([Object3D object]);
 
   external void update(Object3D object);
 }
 
-/*@anonymous*/
 @JS()
-class CameraHelper {
-  external factory CameraHelper /* extends LineSegments */ (Camera camera);
+class CameraHelper extends LineSegments {
+  external factory CameraHelper([Camera camera]);
 
   external Camera get camera;
   external set camera(Camera v);
-/*         pointMap # [id: String]: external List<num get >; # ; */ external void update();
+/*         pointMap # [id: String]: external List<num get >; # ; */ external void
+      update();
 }
 
-/*@anonymous*/
 @JS()
-class DirectionalLightHelper {
-  external factory DirectionalLightHelper /* extends Object3D */ (Light light, num size);
+class DirectionalLightHelper extends Object3D {
+  external factory DirectionalLightHelper([Light light, num size]);
 
   external Light get light;
   external set light(Light v);
@@ -4736,16 +5182,15 @@ class DirectionalLightHelper {
   external void update();
 }
 
-/*@anonymous*/
 @JS()
-class EdgesHelper {
-  external factory EdgesHelper /* extends LineSegments */ (Object3D object, num hex, num thresholdAngle);
+class EdgesHelper extends LineSegments {
+  external factory EdgesHelper([Object3D object, num hex, num thresholdAngle]);
 }
 
-/*@anonymous*/
 @JS()
-class FaceNormalsHelper {
-  external factory FaceNormalsHelper /* extends LineSegments */ (Object3D object, num size, num hex, num linewidth);
+class FaceNormalsHelper extends LineSegments {
+  external factory FaceNormalsHelper(
+      [Object3D object, num size, num hex, num linewidth]);
 
   external Object3D get object;
   external set object(Object3D v);
@@ -4754,10 +5199,9 @@ class FaceNormalsHelper {
   external void update(Object3D object);
 }
 
-/*@anonymous*/
 @JS()
-class GridHelper {
-  external factory GridHelper /* extends LineSegments */ (num size, num step);
+class GridHelper extends LineSegments {
+  external factory GridHelper([num size, num step]);
 
   external Color get color1;
   external set color1(Color v);
@@ -4766,10 +5210,9 @@ class GridHelper {
   external void setColors(num colorCenterLine, num colorGrid);
 }
 
-/*@anonymous*/
 @JS()
-class HemisphereLightHelper {
-  external factory HemisphereLightHelper /* extends Object3D */ (Light light, num sphereSize);
+class HemisphereLightHelper extends Object3D {
+  external factory HemisphereLightHelper([Light light, num sphereSize]);
 
   external Light get light;
   external set light(Light v);
@@ -4781,10 +5224,9 @@ class HemisphereLightHelper {
   external void update();
 }
 
-/*@anonymous*/
 @JS()
-class PointLightHelper {
-  external factory PointLightHelper /* extends Object3D */ (Light light, num sphereSize);
+class PointLightHelper extends Object3D {
+  external factory PointLightHelper([Light light, num sphereSize]);
 
   external Light get light;
   external set light(Light v);
@@ -4792,10 +5234,9 @@ class PointLightHelper {
   external void update();
 }
 
-/*@anonymous*/
 @JS()
-class SkeletonHelper {
-  external factory SkeletonHelper /* extends LineSegments */ (Object3D bone);
+class SkeletonHelper extends LineSegments {
+  external factory SkeletonHelper([Object3D bone]);
 
   external List<Bone> get bones;
   external set bones(List<Bone> v);
@@ -4805,10 +5246,10 @@ class SkeletonHelper {
   external void update();
 }
 
-/*@anonymous*/
 @JS()
-class SpotLightHelper {
-  external factory SpotLightHelper /* extends Object3D */ (Light light, num sphereSize, num arrowLength);
+class SpotLightHelper extends Object3D {
+  external factory SpotLightHelper(
+      [Light light, num sphereSize, num arrowLength]);
 
   external Light get light;
   external set light(Light v);
@@ -4818,10 +5259,10 @@ class SpotLightHelper {
   external void update();
 }
 
-/*@anonymous*/
 @JS()
-class VertexNormalsHelper {
-  external factory VertexNormalsHelper /* extends LineSegments */ (Object3D object, num size, num hex, num linewidth);
+class VertexNormalsHelper extends LineSegments {
+  external factory VertexNormalsHelper(
+      [Object3D object, num size, num hex, num linewidth]);
 
   external Object3D get object;
   external set object(Object3D v);
@@ -4830,23 +5271,20 @@ class VertexNormalsHelper {
   external void update(Object3D object);
 }
 
-/*@anonymous*/
 @JS()
-class WireframeHelper {
-  external factory WireframeHelper /* extends LineSegments */ (Object3D object, num hex);
+class WireframeHelper extends LineSegments {
+  external factory WireframeHelper([Object3D object, num hex]);
 }
 
-/*@anonymous*/
 @JS()
-class ImmediateRenderObject {
-  external factory ImmediateRenderObject /* extends Object3D */ (Material material);
+class ImmediateRenderObject extends Object3D {
+  external factory ImmediateRenderObject([Material material]);
 
   external Material get material;
   external set material(Material v);
   external void render(Function renderCallback);
 }
 
-/*@anonymous*/
 @JS()
 class MorphBlendMeshAnimation {
   external factory MorphBlendMeshAnimation();
@@ -4879,10 +5317,9 @@ class MorphBlendMeshAnimation {
   external set mirroredLoop(bool v);
 }
 
-/*@anonymous*/
 @JS()
-class MorphBlendMesh {
-  external factory MorphBlendMesh /* extends Mesh */ (Geometry geometry, Material material);
+class MorphBlendMesh extends Mesh {
+  external factory MorphBlendMesh([Geometry geometry, Material material]);
 
   /*         animationsMap # name: external Strin get g;
 		external set g(Strin v); # ; */
