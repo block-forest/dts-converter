@@ -1,5 +1,22 @@
 # TypeScript definition to Dart JS interop facade converter
 
+# About
+
+Take TypeScript definition files (.d.ts) from [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)
+and create Dart JS interop facades with this script. Well, at least try to. It's tricky as hell. Zillions of edge cases.
+But at least you don't have to do _everything_ yourself.
+
+# Disclaimer
+
+So far, the converter has been tested on and optimized for the following javascript frameworks
+
+* ChartJS
+* [THREE.js](https://github.com/blockforest/threejs-dart-facade)
+* [BabylonJS](https://github.com/blockforest/babylonjs-dart-facade)
+
+While Dart Analyzer reports the resulting library as free of errors, nothing except what's needed by the demos has been tested.
+The library will only be lightly maintained. I don't have time for this :)
+
 # Installation
 
 ### Requirements
